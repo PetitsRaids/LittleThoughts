@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">LittleThoughts</string>
+    <string name="app_name">Little Thoughts</string>
+    <string name="user_name">Petits Raids</string>
+    <string name="email">gakki611@ga.com</string>
+    <string name="cover_description">The background of head portrait</string>
+    <string name="head_portrait">head portrait</string>
 </resources>
