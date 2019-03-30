@@ -24,11 +24,13 @@
                 app:popupTheme="@style/Base.ThemeOverlay.AppCompat.Dark.ActionBar" />
         </android.support.design.widget.AppBarLayout>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/app_name"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+        <fragment
+            android:id="@+id/todo_fragment"
+            android:name="com.example.littlethoughts.TodoFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
     </android.support.design.widget.CoordinatorLayout>
 
     <android.support.design.widget.NavigationView
@@ -36,11 +38,24 @@
         android:layout_height="match_parent"
         android:layout_gravity="start">
 
-        <fragment
-            android:id="@+id/head"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:name="com.example.littlethoughts.HeadFrameLayout"/>
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <fragment
+                android:id="@+id/head"
+                android:name="com.example.littlethoughts.HeadFragment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <fragment
+                android:id="@+id/menu"
+                android:name="com.example.littlethoughts.MenuFragment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
 
     </android.support.design.widget.NavigationView>
 </android.support.v4.widget.DrawerLayout>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ExpandableListView
+        android:id="@+id/all_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </ExpandableListView>
+
+    <!--<Button-->
+        <!--android:id="@+id/todo_btn"-->
+        <!--style="?android:attr/borderlessButtonStyle"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:background="@color/buttonColor"-->
+        <!--android:paddingStart="0dp"-->
+        <!--android:paddingEnd="240dp"-->
+        <!--android:text="@string/todo"-->
+        <!--android:textSize="16sp" />-->
+
+    <!--<ListView-->
+        <!--android:id="@+id/todo_list_view"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content">-->
+
+    <!--</ListView>-->
+
+    <!--<Button-->
+        <!--android:id="@+id/thought_btn"-->
+        <!--style="?android:attr/borderlessButtonStyle"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:background="@color/buttonColor"-->
+        <!--android:paddingStart="0dp"-->
+        <!--android:paddingEnd="240dp"-->
+        <!--android:text="@string/thoughts"-->
+        <!--android:textSize="16sp" />-->
+
+    <!--<ListView-->
+        <!--android:id="@+id/thought_list_view"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content">-->
+
+    <!--</ListView>-->
+
+</LinearLayout>

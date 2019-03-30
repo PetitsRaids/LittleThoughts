@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class HeadFrameLayout extends Fragment {
+public class HeadFragment extends Fragment {
 
     private ImageView cover, headPortrait;
 
@@ -31,7 +31,7 @@ public class HeadFrameLayout extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         cover.setImageDrawable(getResources().getDrawable(R.drawable.linmeimei));
-        GlideApp.with(HeadFrameLayout.this).load(R.drawable.xiao_ice).circleCrop().into(headPortrait);
+        GlideApp.with(HeadFragment.this).load(R.drawable.xiao_ice).circleCrop().into(headPortrait);
         userName.setText(R.string.user_name);
         email.setText(R.string.email);
     }
