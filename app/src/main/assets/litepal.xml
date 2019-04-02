@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<litepal>
+
+    <dbname value="littethought" />
+
+    <version value="1" />
+
+    <list>
+        <mapping class="com.example.littlethoughts.db.TodoList"/>
+        <mapping class="com.example.littlethoughts.db.TodoItem"/>
+        <mapping class="com.example.littlethoughts.db.ThoughtsList"/>
+        <mapping class="com.example.littlethoughts.db.ThoughtsItem"/>
+    </list>
+</litepal>
