@@ -36,11 +36,7 @@ public class MenuFragment extends Fragment {
             MainActivity mainActivity = (MainActivity) getActivity();
             if (mainActivity != null) {
                 mainActivity.drawerLayout.closeDrawers();
-                TodoFragment todoFragment = new TodoFragment();
-                Bundle bundle = new Bundle();
-                bundle.putInt("list_id", groupPosition + 1);
-                todoFragment.setArguments(bundle);
-                mainActivity.replaceFragment(todoFragment);
+                mainActivity.showHideFragment(groupPosition, childPosition);
             }
             return true;
         });

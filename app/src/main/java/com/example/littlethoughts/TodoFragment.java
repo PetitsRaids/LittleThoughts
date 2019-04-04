@@ -6,6 +6,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,39 +23,47 @@ import org.litepal.LitePal;
 
 import java.util.List;
 
-import static android.support.constraint.Constraints.TAG;
-
 public class TodoFragment extends Fragment {
+
+    private static final String TAG = "TodoFragment";
 
     RecyclerView todoRecyclerView;
 
-    public TodoAdapter adapter;
+    private TodoAdapter adapter;
 
     public LinearLayout addTodoLayout;
 
-    List<TodoItem> todoItemList;
+    public List<TodoItem> todoItemList;
 
     private static TodoList todoList;
+
+    public int childId;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.todo_layout, container, false);
         todoRecyclerView = view.findViewById(R.id.todo_recycler_view);
+
         Bundle bundle = getArguments();
-        int listId;
         if (bundle != null){
-            listId = bundle.getInt("list_id");
+            childId = bundle.getInt("list_id");
         }else {
-            listId = 1;
+            childId = 1;
         }
-        getTodoItem(listId);
+        todoItemList = getTodoItem(childId);
         adapter = new TodoAdapter(getContext(), todoItemList);
         LinearLayoutManager manager = new LinearLayoutManager(getContext());
         manager.setOrientation(LinearLayoutManager.VERTICAL);
         todoRecyclerView.setLayoutManager(manager);
         todoRecyclerView.setAdapter(adapter);
-        addTodoLayout = new LinearLayout(getContext());
+
+        ItemTouchHelper itemTouchHelper =
+                new ItemTouchHelper(new TodoItemCallback(todoItemList, adapter));
+        itemTouchHelper.attachToRecyclerView(todoRecyclerView);
+
+        addTodoLayout = view.findViewById(R.id.add_todo_layout);
+        addTodoLayout.setVisibility(View.GONE);
         EditText addTodoEdit = view.findViewById(R.id.add_todo_edit);
         Button addTodoBtn = view.findViewById(R.id.add_todo_btn);
         addTodoBtn.setOnClickListener(v -> {
@@ -68,6 +78,8 @@ public class TodoFragment extends Fragment {
             todoRecyclerView.scrollToPosition(todoItemList.size() - 1);
             addTodoEdit.setText("");
             addTodoLayout.setVisibility(View.GONE);
+            MainActivity mainActivity = (MainActivity) getActivity();
+            mainActivity.floatingActionButton.show();
         });
         return view;
     }
@@ -77,10 +89,22 @@ public class TodoFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
     }
 
-    private void getTodoItem(int listId){
-        todoList = LitePal.find(TodoList.class, listId);
-        todoItemList = LitePal.where("todolist_id = ?", String.valueOf(listId))
-                .find(TodoItem.class);
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if(!hidden){
+            todoItemList.clear();
+            todoItemList.addAll(getTodoItem(childId));
+            adapter.notifyDataSetChanged();
+            Log.d(TAG, "onHiddenChanged");
+        }
+
+    }
+
+    public List<TodoItem> getTodoItem(int childId){
+        todoList = LitePal.find(TodoList.class, childId);
+        return LitePal.where("todolist_id = ?",
+                String.valueOf(childId)).find(TodoItem.class);
     }
 
     public TodoList getTodoList() {

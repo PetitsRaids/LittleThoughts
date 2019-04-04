@@ -3,6 +3,7 @@ package com.example.littlethoughts.adapter;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,20 +45,27 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder> {
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View view = LayoutInflater.from(mContext)
                 .inflate(R.layout.todo_item, viewGroup, false);
-        ViewHolder viewHolder = new ViewHolder(view);
-        viewHolder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            notifyItemRemoved(i);
-        });
-        viewHolder.clickView.setOnClickListener(v->{
-            Toast.makeText(mContext, todoItems.get(i).getName(), Toast.LENGTH_SHORT).show();
-        });
-        return viewHolder;
+        return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
+        viewHolder.clickView.setOnClickListener(v->{
+            Log.d("TodoAdapter", "onBindViewHolder: " + i);
+            Toast.makeText(mContext, todoItems.get(i).getName(), Toast.LENGTH_SHORT).show();
+        });
+        // 有疑问，下面两行代码换过位置之后，从多的数据切换到少的数据的时候会出现越界错误
+        viewHolder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            TodoItem todoItem = todoItems.get(i);
+            // 如果要把一个值置为默认值，需要使用setToDefault()方法
+            if(isChecked){
+                todoItem.setChecked(true);
+            }else{
+                todoItem.setToDefault("checked");
+            }
+            todoItem.update(todoItem.getId());
+        });
         viewHolder.checkBox.setChecked(todoItems.get(i).isChecked());
-        viewHolder.checkBox.setFocusable(false);
         viewHolder.textView.setText(todoItems.get(i).getName());
     }
 
