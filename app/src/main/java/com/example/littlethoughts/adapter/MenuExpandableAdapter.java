@@ -2,7 +2,6 @@ package com.example.littlethoughts.adapter;
 
 import android.content.Context;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,8 +16,6 @@ import com.example.littlethoughts.db.ThoughtsList;
 import com.example.littlethoughts.db.TodoList;
 
 import java.util.List;
-
-import static android.support.constraint.Constraints.TAG;
 
 public class MenuExpandableAdapter extends BaseExpandableListAdapter {
 
@@ -57,7 +54,7 @@ public class MenuExpandableAdapter extends BaseExpandableListAdapter {
         }
 
         groupViewHolder.listName.setText(listNames[groupPosition]);
-        groupViewHolder.addList.setOnClickListener((view) -> {
+        groupViewHolder.addList.setOnClickListener(view -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
             View dialogView = LayoutInflater.from(mContext).inflate(R.layout.add_list_dialog, null, false);
             TextView textView = dialogView.findViewById(R.id.add_text);
@@ -69,10 +66,8 @@ public class MenuExpandableAdapter extends BaseExpandableListAdapter {
             dialog.setCancelable(true);
             String str = "添加" + listNames[groupPosition];
             textView.setText(str);
-            cancelAdd.setOnClickListener((v ->
-                    dialog.dismiss()
-            ));
-            sureAdd.setOnClickListener((v -> {
+            cancelAdd.setOnClickListener(v -> dialog.dismiss());
+            sureAdd.setOnClickListener(v -> {
                 String val = editText.getText().toString();
                 if (val.equals("")) {
                     Toast.makeText(mContext, "请输入列表名称！", Toast.LENGTH_SHORT).show();
@@ -93,7 +88,7 @@ public class MenuExpandableAdapter extends BaseExpandableListAdapter {
                     Toast.makeText(mContext, "已添加", Toast.LENGTH_SHORT).show();
                     dialog.dismiss();
                 }
-            }));
+            });
             dialog.show();
         });
         groupViewHolder.addList.setFocusable(false);

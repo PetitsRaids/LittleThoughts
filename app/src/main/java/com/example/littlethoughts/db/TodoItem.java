@@ -10,6 +10,8 @@ public class TodoItem extends LitePalSupport {
 
     private String name;
 
+    private int orderId;
+
     private TodoList todoList;
 
     public int getId() {
@@ -34,6 +36,14 @@ public class TodoItem extends LitePalSupport {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(int orderId) {
+        this.orderId = orderId;
     }
 
     public TodoList getTodoList() {

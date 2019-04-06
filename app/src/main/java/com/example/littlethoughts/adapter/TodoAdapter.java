@@ -1,6 +1,8 @@
 package com.example.littlethoughts.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -59,13 +61,20 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder> {
             TodoItem todoItem = todoItems.get(i);
             // 如果要把一个值置为默认值，需要使用setToDefault()方法
             if(isChecked){
+                viewHolder.textView.setPaintFlags
+                        (viewHolder.textView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                viewHolder.textView.setAlpha(0.5f);
                 todoItem.setChecked(true);
             }else{
                 todoItem.setToDefault("checked");
+                viewHolder.textView.setPaintFlags
+                        (viewHolder.textView.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+                viewHolder.textView.setAlpha(1);
             }
             todoItem.update(todoItem.getId());
         });
         viewHolder.checkBox.setChecked(todoItems.get(i).isChecked());
+        viewHolder.textView.setTextColor(Color.BLACK);
         viewHolder.textView.setText(todoItems.get(i).getName());
     }
 
