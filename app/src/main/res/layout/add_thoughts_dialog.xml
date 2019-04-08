@@ -19,6 +19,8 @@
         android:background="@drawable/edit_background"
         android:hint="@string/add_thoughts_hint"
         android:inputType="textMultiLine"
+        android:textSize="20sp"
+        android:padding="10dp"
         android:maxLines="6" />
 
     <LinearLayout

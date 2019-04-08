@@ -20,9 +20,11 @@ import java.util.List;
 
 public class ThoughtsFragment extends Fragment {
 
-    List<ThoughtsItem> thoughtsItemList;
+    public List<ThoughtsItem> thoughtsItemList;
 
     private static ThoughtsList thoughtsList;
+
+    public ThoughtsAdapter adapter;
 
     public int childId;
 
@@ -30,14 +32,24 @@ public class ThoughtsFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.thoughts_layout, container, false);
-        thoughtsItemList = getThoughtsItemList(1);
-        ThoughtsAdapter adapter = new ThoughtsAdapter(getContext(), thoughtsItemList);
+        thoughtsItemList = getThoughtsItemList(childId);
+        adapter = new ThoughtsAdapter(getContext(), thoughtsItemList);
         LinearLayoutManager manager = new LinearLayoutManager(getContext());
         manager.setOrientation(LinearLayoutManager.VERTICAL);
         RecyclerView thoughtsRecyclerView = view.findViewById(R.id.thoughts_recycler_view);
         thoughtsRecyclerView.setLayoutManager(manager);
         thoughtsRecyclerView.setAdapter(adapter);
         return view;
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if(!hidden){
+            thoughtsItemList.clear();
+            thoughtsItemList.addAll(getThoughtsItemList(childId));
+            adapter.notifyDataSetChanged();
+        }
     }
 
     public List<ThoughtsItem> getThoughtsItemList(int childId){

@@ -2,19 +2,15 @@ package com.example.littlethoughts.db;
 
 import org.litepal.crud.LitePalSupport;
 
-import java.sql.Date;
-
 public class ThoughtsItem extends LitePalSupport {
 
     private int id;
-
-    private String title;
 
     private String content;
 
     private ThoughtsList thoughtsList;
 
-    private Date createTime;
+    private String createTime;
 
     public int getId() {
         return id;
@@ -22,14 +18,6 @@ public class ThoughtsItem extends LitePalSupport {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     public String getContent() {
@@ -48,11 +36,11 @@ public class ThoughtsItem extends LitePalSupport {
         this.content = content;
     }
 
-    public Date getCreateTime() {
+    public String getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Date createTime) {
+    public void setCreateTime(String createTime) {
         this.createTime = createTime;
     }
 

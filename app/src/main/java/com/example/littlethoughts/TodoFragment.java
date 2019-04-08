@@ -27,10 +27,6 @@ import java.util.List;
 
 public class TodoFragment extends Fragment {
 
-    private static final String TAG = "TodoFragment";
-
-    RecyclerView todoRecyclerView;
-
     private TodoAdapter adapter;
 
     public LinearLayout addTodoLayout;
@@ -47,14 +43,14 @@ public class TodoFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.todo_layout, container, false);
-        todoRecyclerView = view.findViewById(R.id.todo_recycler_view);
-
-        Bundle bundle = getArguments();
-        if (bundle != null) {
-            childId = bundle.getInt("list_id");
-        } else {
-            childId = 1;
-        }
+        RecyclerView todoRecyclerView = view.findViewById(R.id.todo_recycler_view);
+        Log.d("Todo", "onCreateView");
+//        Bundle bundle = getArguments();
+//        if (bundle != null) {
+//            childId = bundle.getInt("list_id");
+//        } else {
+//            childId = 1;
+//        }
         todoItemList = getTodoItem(childId);
         adapter = new TodoAdapter(getContext(), todoItemList);
         LinearLayoutManager manager = new LinearLayoutManager(getContext());
@@ -100,6 +96,7 @@ public class TodoFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        Log.d("Todo", "onActivityCreated: ");
     }
 
     @Override
@@ -109,9 +106,8 @@ public class TodoFragment extends Fragment {
             todoItemList.clear();
             todoItemList.addAll(getTodoItem(childId));
             adapter.notifyDataSetChanged();
-            Log.d(TAG, "onHiddenChanged");
         }
-
+        Log.d("Todo", "onHiddenChanged");
     }
 
     public List<TodoItem> getTodoItem(int childId) {

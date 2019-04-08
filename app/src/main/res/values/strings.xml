@@ -12,4 +12,6 @@
     <string name="add_todo_item">添加待办事项</string>
     <string name="add_thoughts">添加小想法</string>
     <string name="add_thoughts_hint">在此输入内容</string>
+    <string name="save">保存</string>
+    <string name="edit_thoughts">编辑小想法</string>
 </resources>

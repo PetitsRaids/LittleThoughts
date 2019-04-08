@@ -1,7 +1,9 @@
 package com.example.littlethoughts.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.littlethoughts.R;
+import com.example.littlethoughts.ThoughtsEditActivity;
 import com.example.littlethoughts.db.ThoughtsItem;
 
 import java.util.List;
@@ -25,13 +28,13 @@ public class ThoughtsAdapter extends RecyclerView.Adapter<ThoughtsAdapter.ViewHo
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-        TextView thoughtsTitle;
         TextView thoughtsContent;
         TextView createTime;
+        CardView cardView;
 
         ViewHolder(View view) {
             super(view);
-            thoughtsTitle = view.findViewById(R.id.thoughts_title);
+            cardView = view.findViewById(R.id.thoughts_card_view);
             thoughtsContent = view.findViewById(R.id.thoughts_content);
             createTime = view.findViewById(R.id.create_time);
         }
@@ -41,15 +44,20 @@ public class ThoughtsAdapter extends RecyclerView.Adapter<ThoughtsAdapter.ViewHo
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.thoughts_item, viewGroup, false);
-        return new ViewHolder(view);
+        ViewHolder viewHolder = new ViewHolder(view);
+        viewHolder.cardView.setOnClickListener(l -> {
+            Intent intent = new Intent(mContext, ThoughtsEditActivity.class);
+            intent.putExtra("thoughts_id", thoughtsItemList.get(viewHolder.getAdapterPosition()).getId());
+            mContext.startActivity(intent);
+        });
+        return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
         ThoughtsItem thoughtsItem = thoughtsItemList.get(i);
-        viewHolder.thoughtsTitle.setText(thoughtsItem.getTitle());
         viewHolder.thoughtsContent.setText(thoughtsItem.getContent());
-        viewHolder.createTime.setText(thoughtsItem.getCreateTime().toString());
+        viewHolder.createTime.setText(thoughtsItem.getCreateTime());
     }
 
     @Override
