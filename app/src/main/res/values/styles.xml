@@ -8,6 +8,8 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="linmeimei" parent="AppTheme"/>
+
     <style name="ToolbarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="android:actionMenuTextAppearance">@style/ToolbarMenuTextSize</item>
     </style>

@@ -14,4 +14,12 @@
     <string name="add_thoughts_hint">在此输入内容</string>
     <string name="save">保存</string>
     <string name="edit_thoughts">编辑小想法</string>
+    <string name="introduction">请添加/选择待办事项或者小想法</string>
+    <string name="remove_list">删除此列表</string>
+    <string name="exit">退出APP</string>
+    <string name="delete">删除</string>
+    <string name="delete_make_sure">确认删除</string>
+    <string name="delete_message">删掉吗？</string>
+    <string name="delete_without_select">请先选择一个列表</string>
+    <string name="edit_list_name">编辑列表名称</string>
 </resources>

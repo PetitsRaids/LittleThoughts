@@ -1,6 +1,8 @@
 package com.example.littlethoughts;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -20,16 +22,20 @@ import java.util.List;
 
 public class MenuFragment extends Fragment {
 
-    private List<List<String>> childList;
+    private static List<List<String>> childList;
+
+    private static MenuExpandableAdapter adapter;
+
+    ExpandableListView expandableListView;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.menu_layout, container, false);
-        ExpandableListView expandableListView = view.findViewById(R.id.all_list);
+        expandableListView = view.findViewById(R.id.all_list);
         childList = new ArrayList<>();
         getChildList();
-        MenuExpandableAdapter adapter = new MenuExpandableAdapter(getContext(),
+        adapter = new MenuExpandableAdapter(getContext(),
                 new String[]{"待办事项", "小想法"}, childList);
         expandableListView.setAdapter(adapter);
         expandableListView.setOnChildClickListener((parent, v, groupPosition, childPosition, id) -> {
@@ -40,6 +46,16 @@ public class MenuFragment extends Fragment {
             }
             return true;
         });
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(getContext());
+        boolean expand0 = sharedPreferences.getBoolean("expand0", false);
+        boolean expand1 = sharedPreferences.getBoolean("expand1", false);
+        if(expand0){
+            expandableListView.expandGroup(0);
+        }
+        if(expand1){
+            expandableListView.expandGroup(1);
+        }
         return view;
     }
 
@@ -64,4 +80,18 @@ public class MenuFragment extends Fragment {
         childList.add(list);
     }
 
+    public void removeChild(int groupId, int childId){
+        childList.get(groupId).remove(childId);
+        adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        SharedPreferences.Editor editor =
+                PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
+        editor.putBoolean("expand0", expandableListView.isGroupExpanded(0));
+        editor.putBoolean("expand1", expandableListView.isGroupExpanded(1));
+        editor.apply();
+    }
 }
