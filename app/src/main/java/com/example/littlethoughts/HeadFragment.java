@@ -30,8 +30,8 @@ public class HeadFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        cover.setImageDrawable(getResources().getDrawable(R.drawable.linmeimei));
-        GlideApp.with(HeadFragment.this).load(R.drawable.xiao_ice).circleCrop().into(headPortrait);
+        cover.setImageDrawable(getResources().getDrawable(R.drawable.sensei));
+        GlideApp.with(HeadFragment.this).load(R.drawable.sensei3).circleCrop().into(headPortrait);
         userName.setText(R.string.user_name);
         email.setText(R.string.email);
     }

@@ -80,6 +80,11 @@ public class MenuFragment extends Fragment {
         childList.add(list);
     }
 
+    public void editChild(int groupId, int childId, String name){
+        childList.get(groupId).set(childId, name);
+        adapter.notifyDataSetChanged();
+    }
+
     public void removeChild(int groupId, int childId){
         childList.get(groupId).remove(childId);
         adapter.notifyDataSetChanged();

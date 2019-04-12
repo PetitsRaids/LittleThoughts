@@ -163,6 +163,31 @@ public class MainActivity extends AppCompatActivity {
                 drawerLayout.openDrawer(Gravity.START);
                 break;
             case R.id.edit_list:
+                if (groupId != -1) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    View view = LayoutInflater.from(MainActivity.this).inflate(R.layout.edit_list_dialog, null, false);
+                    EditText editText = view.findViewById(R.id.edit_list_name);
+                    Button cancel = view.findViewById(R.id.edit_cancel);
+                    Button editName = view.findViewById(R.id.edit_sure);
+                    builder.setView(view);
+                    AlertDialog dialog = builder.create();
+                    cancel.setOnClickListener(l -> dialog.dismiss());
+                    editName.setOnClickListener(l -> {
+                        String str = editText.getText().toString();
+                        MenuFragment menuFragment = new MenuFragment();
+                        menuFragment.editChild(groupId, childId, str);
+                        toolbarLayout.setTitle(str);
+                        if(groupId == 0){
+                            todoFragment.refreshListName(str);
+                        }else{
+                            thoughtsFragment.refreshListName(str);
+                        }
+                        dialog.dismiss();
+                    });
+                    dialog.show();
+                } else {
+                    Toast.makeText(this, R.string.delete_without_select, Toast.LENGTH_SHORT).show();
+                }
                 break;
             case R.id.remove_list:
                 if (groupId != -1) {

@@ -161,14 +161,17 @@ public class TodoFragment extends Fragment {
     }
 
     public void removeList(){
-//        todoItemList = LitePal.where
-//                ("todolist_id = ?", String.valueOf(todoList.getId())).find(TodoItem.class);
         for(TodoItem todoItem : todoItemList){
             todoItem.delete();
         }
         todoItemList.clear();
         todoList.delete();
         adapter.notifyDataSetChanged();
+    }
+
+    public void refreshListName(String name){
+        todoList.setListName(name);
+        todoList.update(todoList.getId());
     }
 
     public List<TodoItem> getTodoItem(int childId) {

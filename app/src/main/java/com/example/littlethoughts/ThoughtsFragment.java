@@ -1,7 +1,7 @@
 package com.example.littlethoughts;
 
 import android.content.Context;
-import android.nfc.Tag;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -51,7 +51,7 @@ public class ThoughtsFragment extends Fragment {
         Log.d(TAG, "onCreateView");
         View view = inflater.inflate(R.layout.thoughts_layout, container, false);
         thoughtsItemList = getThoughtsItemList(childId);
-        adapter = new ThoughtsAdapter(getContext(), thoughtsItemList);
+        adapter = new ThoughtsAdapter(getActivity(), thoughtsItemList);
         LinearLayoutManager manager = new LinearLayoutManager(getContext());
         manager.setOrientation(LinearLayoutManager.VERTICAL);
         RecyclerView thoughtsRecyclerView = view.findViewById(R.id.thoughts_recycler_view);
@@ -69,6 +69,7 @@ public class ThoughtsFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        refreshList();
         Log.d(TAG, "onStart");
     }
 
@@ -111,25 +112,34 @@ public class ThoughtsFragment extends Fragment {
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
-        if(!hidden){
-            thoughtsItemList.clear();
-            thoughtsItemList.addAll(getThoughtsItemList(childId));
-            adapter.notifyDataSetChanged();
+        if (!hidden) {
+            refreshList();
         }
     }
 
-    public List<ThoughtsItem> getThoughtsItemList(int childId){
+    public List<ThoughtsItem> getThoughtsItemList(int childId) {
         thoughtsList = LitePal.find(ThoughtsList.class, childId);
         return LitePal.where("thoughtslist_id = ?", String.valueOf(childId))
                 .find(ThoughtsItem.class);
     }
 
-    public void removeList(){
-        for (ThoughtsItem thoughtsItem : thoughtsItemList){
+    public void removeList() {
+        for (ThoughtsItem thoughtsItem : thoughtsItemList) {
             thoughtsItem.delete();
         }
         thoughtsItemList.clear();
         thoughtsList.delete();
+        adapter.notifyDataSetChanged();
+    }
+
+    public void refreshListName(String name){
+        thoughtsList.setThoughts(name);
+        thoughtsList.update(thoughtsList.getId());
+    }
+
+    private void refreshList() {
+        thoughtsItemList.clear();
+        thoughtsItemList.addAll(getThoughtsItemList(childId));
         adapter.notifyDataSetChanged();
     }
 
