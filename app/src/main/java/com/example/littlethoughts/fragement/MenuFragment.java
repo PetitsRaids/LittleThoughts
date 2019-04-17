@@ -1,16 +1,18 @@
-package com.example.littlethoughts;
+package com.example.littlethoughts.fragement;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 
+import com.example.littlethoughts.MainActivity;
+import com.example.littlethoughts.R;
 import com.example.littlethoughts.adapter.MenuExpandableAdapter;
 import com.example.littlethoughts.db.ThoughtsList;
 import com.example.littlethoughts.db.TodoList;
@@ -26,7 +28,7 @@ public class MenuFragment extends Fragment {
 
     private static MenuExpandableAdapter adapter;
 
-    ExpandableListView expandableListView;
+    private ExpandableListView expandableListView;
 
     @Nullable
     @Override

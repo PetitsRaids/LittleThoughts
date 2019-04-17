@@ -1,7 +1,7 @@
 package com.example.littlethoughts.adapter;
 
 import android.content.Context;
-import android.support.v7.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

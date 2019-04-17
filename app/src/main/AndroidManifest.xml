@@ -7,13 +7,15 @@
     <application
         android:name="org.litepal.LitePalApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/app_logo"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/app_logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ThoughtsEditActivity"></activity>
-        <activity android:name=".MainActivity"
+        <activity android:name=".TodoAlarmActivity"></activity>
+        <activity android:name=".ThoughtsEditActivity" />
+        <activity
+            android:name=".MainActivity"
             android:theme="@style/linmeimei"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
@@ -22,6 +24,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <provider
+            android:authorities="com.example.littlethoughts"
+            android:name=".provider.ThoughtsProvider"/>
     </application>
 
 </manifest>

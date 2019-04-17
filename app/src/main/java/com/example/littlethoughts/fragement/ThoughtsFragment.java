@@ -1,18 +1,18 @@
-package com.example.littlethoughts;
+package com.example.littlethoughts.fragement;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.littlethoughts.R;
 import com.example.littlethoughts.adapter.ThoughtsAdapter;
 import com.example.littlethoughts.db.ThoughtsItem;
 import com.example.littlethoughts.db.ThoughtsList;
@@ -53,7 +53,7 @@ public class ThoughtsFragment extends Fragment {
         thoughtsItemList = getThoughtsItemList(childId);
         adapter = new ThoughtsAdapter(getActivity(), thoughtsItemList);
         LinearLayoutManager manager = new LinearLayoutManager(getContext());
-        manager.setOrientation(LinearLayoutManager.VERTICAL);
+        manager.setOrientation(RecyclerView.VERTICAL);
         RecyclerView thoughtsRecyclerView = view.findViewById(R.id.thoughts_recycler_view);
         thoughtsRecyclerView.setLayoutManager(manager);
         thoughtsRecyclerView.setAdapter(adapter);
@@ -117,7 +117,7 @@ public class ThoughtsFragment extends Fragment {
         }
     }
 
-    public List<ThoughtsItem> getThoughtsItemList(int childId) {
+    private List<ThoughtsItem> getThoughtsItemList(int childId) {
         thoughtsList = LitePal.find(ThoughtsList.class, childId);
         return LitePal.where("thoughtslist_id = ?", String.valueOf(childId))
                 .find(ThoughtsItem.class);

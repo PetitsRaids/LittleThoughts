@@ -1,14 +1,14 @@
-package com.example.littlethoughts;
+package com.example.littlethoughts.fragement;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Vibrator;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +17,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import com.example.littlethoughts.MainActivity;
+import com.example.littlethoughts.R;
+import com.example.littlethoughts.TodoItemCallback;
 import com.example.littlethoughts.adapter.TodoAdapter;
 import com.example.littlethoughts.db.TodoItem;
 import com.example.littlethoughts.db.TodoList;
@@ -62,7 +65,7 @@ public class TodoFragment extends Fragment {
         todoItemList = getTodoItem(childId);
         adapter = new TodoAdapter(getContext(), todoItemList);
         LinearLayoutManager manager = new LinearLayoutManager(getContext());
-        manager.setOrientation(LinearLayoutManager.VERTICAL);
+        manager.setOrientation(RecyclerView.VERTICAL);
         todoRecyclerView.setLayoutManager(manager);
         todoRecyclerView.setAdapter(adapter);
         MainActivity mainActivity = (MainActivity) getActivity();
@@ -174,7 +177,7 @@ public class TodoFragment extends Fragment {
         todoList.update(todoList.getId());
     }
 
-    public List<TodoItem> getTodoItem(int childId) {
+    private List<TodoItem> getTodoItem(int childId) {
         todoList = LitePal.find(TodoList.class, childId);
         return LitePal.where("todolist_id = ?", String.valueOf(childId))
                 .order("orderId").find(TodoItem.class);

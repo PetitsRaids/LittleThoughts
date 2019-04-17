@@ -1,19 +1,20 @@
 package com.example.littlethoughts.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.littlethoughts.R;
+import com.example.littlethoughts.TodoAlarmActivity;
 import com.example.littlethoughts.db.TodoItem;
 
 import java.util.List;
@@ -53,8 +54,9 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
         viewHolder.clickView.setOnClickListener(v->{
-            Log.d("TodoAdapter", "onBindViewHolder: " + i);
-            Toast.makeText(mContext, todoItems.get(i).getName(), Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(mContext, TodoAlarmActivity.class);
+            intent.putExtra("todoitem_id", todoItems.get(i).getId());
+            mContext.startActivity(intent);
         });
         // 有疑问，下面两行代码换过位置之后，从多的数据切换到少的数据的时候会出现越界错误
         viewHolder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {

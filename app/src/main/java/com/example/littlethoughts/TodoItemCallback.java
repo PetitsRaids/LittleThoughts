@@ -1,12 +1,7 @@
 package com.example.littlethoughts;
 
 import android.graphics.Color;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 
 import com.example.littlethoughts.adapter.TodoAdapter;
 import com.example.littlethoughts.db.TodoItem;
@@ -14,13 +9,19 @@ import com.example.littlethoughts.db.TodoItem;
 import java.util.Collections;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.RecyclerView;
+
 public class TodoItemCallback extends ItemTouchHelper.Callback {
 
     private List<TodoItem> todoItemList;
 
     private TodoAdapter adapter;
 
-    TodoItemCallback(List<TodoItem> todoItemList, TodoAdapter adapter) {
+    public TodoItemCallback(List<TodoItem> todoItemList, TodoAdapter adapter) {
         this.todoItemList = todoItemList;
         this.adapter = adapter;
     }
@@ -58,14 +59,39 @@ public class TodoItemCallback extends ItemTouchHelper.Callback {
 
     @Override
     public void onMoved(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, int fromPos, @NonNull RecyclerView.ViewHolder target, int toPos, int x, int y) {
-        TodoItem todoItem1 = todoItemList.get(viewHolder.getAdapterPosition());
-        TodoItem todoItem2 = todoItemList.get(target.getAdapterPosition());
+        TodoItem todoItem1 = todoItemList.get(fromPos);
+        TodoItem todoItem2 = todoItemList.get(toPos);
         int val1 = todoItem1.getOrderId();
         int val2 = todoItem2.getOrderId();
-        todoItem1.setOrderId(val2);
-        todoItem2.setOrderId(val1);
-        todoItem1.update(todoItem1.getId());
-        todoItem2.update(todoItem2.getId());
+        Log.d("CALLBACK", "onMoved: val1 " + val1);
+        Log.d("CALLBACK", "onMoved: val2 " + val2);
+        Log.d("CALLBACK", "onMoved: fromPos " + fromPos);
+        Log.d("CALLBACK", "onMoved: toPos " + toPos);
+        if(fromPos == 1){
+            todoItem2.setToDefault("orderId");
+            todoItem2.update(todoItem2.getId());
+        }else{
+            todoItem2.setOrderId(fromPos);
+            todoItem2.update(todoItem2.getId());
+        }
+        if(toPos == 1){
+            todoItem1.setToDefault("orderId");
+            todoItem1.update(todoItem1.getId());
+        }else{
+            todoItem1.setOrderId(toPos);
+            todoItem1.update(todoItem1.getId());
+        }
+//        List<TodoItem> todoItems = LitePal.where("orderid < ? AND orderid > ?", String.valueOf(val1), String.valueOf(val2)).find(TodoItem.class);
+//        for(TodoItem todoItem : todoItems){
+//            if(todoItem.getOrderId() == val1){
+//                todoItem.setOrderId(val2);
+//                todoItem.update(todoItem.getId());
+//                Log.d("CALLBACK", String.valueOf(val2));
+//            }else{
+//                todoItem.setOrderId(todoItem.getOrderId() + 1);
+//                todoItem.update(todoItem.getId());
+//            }
+//        }
     }
 
     @Override

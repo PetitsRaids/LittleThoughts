@@ -1,14 +1,17 @@
-package com.example.littlethoughts;
+package com.example.littlethoughts.fragement;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
+import com.example.littlethoughts.R;
 
 public class HeadFragment extends Fragment {
 
@@ -31,7 +34,7 @@ public class HeadFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         cover.setImageDrawable(getResources().getDrawable(R.drawable.sensei));
-        GlideApp.with(HeadFragment.this).load(R.drawable.sensei3).circleCrop().into(headPortrait);
+        Glide.with(HeadFragment.this).load(R.drawable.sensei3).circleCrop().into(headPortrait);
         userName.setText(R.string.user_name);
         email.setText(R.string.email);
     }

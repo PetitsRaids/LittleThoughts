@@ -23,4 +23,7 @@
     <string name="delete_without_select">请先选择一个列表</string>
     <string name="edit_list_name">编辑列表名称</string>
     <string name="sure_edit">修改</string>
+    <string name="todo_item_name">代办事项名称</string>
+    <string name="set_alarm">设置提醒</string>
+    <string name="alarm_switch_description">设置提醒的按钮</string>
 </resources>

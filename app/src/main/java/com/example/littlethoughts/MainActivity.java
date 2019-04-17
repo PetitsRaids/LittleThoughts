@@ -3,15 +3,17 @@ package com.example.littlethoughts;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.FragmentTransaction;
+
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -26,6 +28,9 @@ import android.widget.Toast;
 import com.example.littlethoughts.db.ThoughtsItem;
 import com.example.littlethoughts.db.ThoughtsList;
 import com.example.littlethoughts.db.TodoList;
+import com.example.littlethoughts.fragement.MenuFragment;
+import com.example.littlethoughts.fragement.ThoughtsFragment;
+import com.example.littlethoughts.fragement.TodoFragment;
 
 import org.litepal.LitePal;
 
