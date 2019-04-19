@@ -8,7 +8,7 @@
     <string name="head_portrait">head portrait</string>
     <string name="fold">to fold or unfold</string>
     <string name="cancel">取消</string>
-    <string name="sure">添加</string>
+    <string name="sure_add">添加</string>
     <string name="add_todo_item">添加待办事项</string>
     <string name="add_thoughts">添加小想法</string>
     <string name="add_thoughts_hint">在此输入内容</string>
@@ -26,4 +26,6 @@
     <string name="todo_item_name">代办事项名称</string>
     <string name="set_alarm">设置提醒</string>
     <string name="alarm_switch_description">设置提醒的按钮</string>
+    <string name="sure">确认</string>
+    <string name="between">\&#064;</string>
 </resources>

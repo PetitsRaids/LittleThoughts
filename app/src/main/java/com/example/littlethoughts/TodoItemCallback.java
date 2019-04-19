@@ -67,31 +67,20 @@ public class TodoItemCallback extends ItemTouchHelper.Callback {
         Log.d("CALLBACK", "onMoved: val2 " + val2);
         Log.d("CALLBACK", "onMoved: fromPos " + fromPos);
         Log.d("CALLBACK", "onMoved: toPos " + toPos);
-        if(fromPos == 1){
+        if(fromPos == 0){
             todoItem2.setToDefault("orderId");
             todoItem2.update(todoItem2.getId());
         }else{
             todoItem2.setOrderId(fromPos);
             todoItem2.update(todoItem2.getId());
         }
-        if(toPos == 1){
+        if(toPos == 0){
             todoItem1.setToDefault("orderId");
             todoItem1.update(todoItem1.getId());
         }else{
             todoItem1.setOrderId(toPos);
             todoItem1.update(todoItem1.getId());
         }
-//        List<TodoItem> todoItems = LitePal.where("orderid < ? AND orderid > ?", String.valueOf(val1), String.valueOf(val2)).find(TodoItem.class);
-//        for(TodoItem todoItem : todoItems){
-//            if(todoItem.getOrderId() == val1){
-//                todoItem.setOrderId(val2);
-//                todoItem.update(todoItem.getId());
-//                Log.d("CALLBACK", String.valueOf(val2));
-//            }else{
-//                todoItem.setOrderId(todoItem.getOrderId() + 1);
-//                todoItem.update(todoItem.getId());
-//            }
-//        }
     }
 
     @Override

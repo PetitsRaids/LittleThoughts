@@ -19,7 +19,7 @@
         android:layout_margin="15dp"
         android:layout_below="@id/add_text"
         android:inputType="text"
-        android:hint="@string/sure"/>
+        android:hint="@string/sure_add"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -40,7 +40,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/sure"
+            android:text="@string/sure_add"
             android:textSize="16sp"
             style="@style/Base.Widget.AppCompat.ButtonBar.AlertDialog"/>
     </LinearLayout>

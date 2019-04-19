@@ -1,8 +1,11 @@
 package com.example.littlethoughts;
 
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+
+import com.example.littlethoughts.broadcast.ReminderReceiver;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -59,6 +62,10 @@ public class MainActivity extends AppCompatActivity {
     TodoList todoList;
 
     ThoughtsList thoughtsList;
+
+    private ReminderReceiver receiver;
+
+    private IntentFilter intentFilter;
 
     public static int isInputing = 0;
 
@@ -147,6 +154,11 @@ public class MainActivity extends AppCompatActivity {
         if (groupId != -1 || childId != -1) {
             showHideFragment(groupId, childId);
         }
+
+        receiver = new ReminderReceiver();
+        intentFilter = new IntentFilter();
+        intentFilter.addAction("com.example.littlethoughts.REMINDER");
+        registerReceiver(receiver, intentFilter);
     }
 
     @Override
@@ -240,6 +252,7 @@ public class MainActivity extends AppCompatActivity {
         editor.putInt("group_id", groupId);
         editor.putInt("child_id", childId);
         editor.apply();
+        unregisterReceiver(receiver);
     }
 
     public void showHideFragment(int groupId, int childPosition) {
