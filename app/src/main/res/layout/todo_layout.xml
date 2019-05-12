@@ -8,7 +8,8 @@
         android:id="@+id/todo_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:layoutAnimation="@anim/animation_recycler_view">
 
     </androidx.recyclerview.widget.RecyclerView>
 
@@ -33,7 +34,7 @@
             android:id="@+id/add_todo_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/sure_add"/>
+            android:text="@string/sure_add" />
     </LinearLayout>
 
 </LinearLayout>

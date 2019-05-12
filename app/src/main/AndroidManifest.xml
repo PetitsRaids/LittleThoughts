@@ -3,6 +3,7 @@
     package="com.example.littlethoughts">
 
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:name=".MyApplication"
@@ -12,10 +13,16 @@
         android:roundIcon="@mipmap/app_logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <service
+            android:name=".service.TestService"
+            android:enabled="true"
+            android:exported="true" />
         <service
             android:name=".service.ReminderService"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <activity android:name=".TodoAlarmActivity" />
         <activity android:name=".ThoughtsEditActivity" />
@@ -32,18 +39,21 @@
 
         <provider
             android:name=".provider.ThoughtsProvider"
-            android:authorities="com.example.littlethoughts"
+            android:authorities="com.example.littlethoughts.provider"
             android:enabled="true"
             android:exported="true" />
 
-        <!--<receiver-->
-            <!--android:name=".broadcast.ReminderReceiver"-->
-            <!--android:enabled="true"-->
-            <!--android:exported="true" >-->
-            <!--<intent-filter>-->
-                <!--<action android:name="com.example.littlethoughts.REMINDER"/>-->
-            <!--</intent-filter>-->
-        <!--</receiver>-->
+        <receiver
+            android:name=".broadcast.ReminderReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.example.littlethoughts.REMINDER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

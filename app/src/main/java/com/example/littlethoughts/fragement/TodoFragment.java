@@ -3,12 +3,6 @@ package com.example.littlethoughts.fragement;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Vibrator;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,7 +20,15 @@ import com.example.littlethoughts.db.TodoList;
 
 import org.litepal.LitePal;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class TodoFragment extends Fragment {
 
@@ -34,21 +36,15 @@ public class TodoFragment extends Fragment {
 
     private TodoAdapter adapter;
 
-    public LinearLayout addTodoLayout;
+    private LinearLayout addTodoLayout;
 
     public EditText addTodoEdit;
 
-    public List<TodoItem> todoItemList;
+    private List<TodoItem> todoItemList;
 
     private static TodoList todoList;
 
     public int childId;
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        Log.d(TAG, "onAttach");
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -62,7 +58,7 @@ public class TodoFragment extends Fragment {
         View view = inflater.inflate(R.layout.todo_layout, container, false);
         RecyclerView todoRecyclerView = view.findViewById(R.id.todo_recycler_view);
         Log.d(TAG, "onCreateView");
-        todoItemList = getTodoItem(childId);
+        todoItemList = new ArrayList<>();
         adapter = new TodoAdapter(getContext(), todoItemList);
         LinearLayoutManager manager = new LinearLayoutManager(getContext());
         manager.setOrientation(RecyclerView.VERTICAL);
@@ -113,6 +109,7 @@ public class TodoFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        refreshList(childId);
         Log.d(TAG, "onStart");
     }
 
@@ -156,34 +153,46 @@ public class TodoFragment extends Fragment {
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
         if (!hidden) {
-            todoItemList.clear();
-            todoItemList.addAll(getTodoItem(childId));
-            adapter.notifyDataSetChanged();
+            refreshList(childId);
         }
         Log.d(TAG, "onHiddenChanged");
     }
 
-    public void removeList(){
-        for(TodoItem todoItem : todoItemList){
-            todoItem.delete();
-        }
-        todoItemList.clear();
-        todoList.delete();
+    public void removeList() {
+        new Thread(() -> {
+            for (TodoItem todoItem : todoItemList) {
+                todoItem.delete();
+            }
+            todoItemList.clear();
+            todoList.delete();
+        }).start();
         adapter.notifyDataSetChanged();
     }
 
-    public void refreshListName(String name){
+    public void refreshListName(String name) {
         todoList.setListName(name);
         todoList.update(todoList.getId());
     }
 
-    private List<TodoItem> getTodoItem(int childId) {
-        todoList = LitePal.find(TodoList.class, childId);
-        return LitePal.where("todolist_id = ?", String.valueOf(childId))
-                .order("orderId").find(TodoItem.class);
+    private void refreshList(int childId) {
+        LitePal.where("todolist_id = ?", String.valueOf(childId))
+                .findAsync(TodoItem.class).listen((allItems) -> {
+            todoList = LitePal.find(TodoList.class, childId);
+            todoItemList.clear();
+            todoItemList.addAll(allItems);
+            adapter.notifyDataSetChanged();
+        });
     }
 
-    public TodoList getTodoList() {
+    private TodoList getTodoList() {
         return todoList;
+    }
+
+    public void showAddLayout() {
+        addTodoLayout.setVisibility(View.VISIBLE);
+    }
+
+    public void unshowAddLayout() {
+        addTodoLayout.setVisibility(View.GONE);
     }
 }

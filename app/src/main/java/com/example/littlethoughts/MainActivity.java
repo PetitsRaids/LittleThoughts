@@ -1,11 +1,11 @@
 package com.example.littlethoughts;
 
-import android.content.IntentFilter;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 
-import com.example.littlethoughts.broadcast.ReminderReceiver;
+import com.example.littlethoughts.service.ReminderService;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -63,10 +63,6 @@ public class MainActivity extends AppCompatActivity {
 
     ThoughtsList thoughtsList;
 
-    private ReminderReceiver receiver;
-
-    private IntentFilter intentFilter;
-
     public static int isInputing = 0;
 
     private int groupId = 0;
@@ -85,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
             if (groupId != -1 && childId != -1) {
                 if (currentFragment == todoFragment) {
                     isInputing = 1;
-                    todoFragment.addTodoLayout.setVisibility(View.VISIBLE);
+                    todoFragment.showAddLayout();
                     inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
                     inputMethodManager.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
                     todoFragment.addTodoEdit.requestFocus();
@@ -110,8 +106,8 @@ public class MainActivity extends AppCompatActivity {
                         thoughtsItem.setThoughtsList(thoughtsFragment.getThoughtsList());
                         thoughtsItem.setCreateTime(getDateTimeInstance().format(new Date(System.currentTimeMillis())));
                         thoughtsItem.save();
-                        thoughtsFragment.thoughtsItemList.add(thoughtsItem);
-                        thoughtsFragment.adapter.notifyItemInserted(thoughtsFragment.adapter.getItemCount() - 1);
+                        thoughtsFragment.addItem(thoughtsItem);
+                        thoughtsFragment.refreshList(thoughtsFragment.adapter.getItemCount() - 1);
                         inputMethodManager.hideSoftInputFromWindow(thoughtsEdit.getWindowToken(), 0);
                         dialog.dismiss();
                         floatingActionButton.show();
@@ -154,11 +150,12 @@ public class MainActivity extends AppCompatActivity {
         if (groupId != -1 || childId != -1) {
             showHideFragment(groupId, childId);
         }
+    }
 
-        receiver = new ReminderReceiver();
-        intentFilter = new IntentFilter();
-        intentFilter.addAction("com.example.littlethoughts.REMINDER");
-        registerReceiver(receiver, intentFilter);
+    @Override
+    protected void onResume() {
+        super.onResume();
+        startService(new Intent(this, ReminderService.class));
     }
 
     @Override
@@ -252,7 +249,6 @@ public class MainActivity extends AppCompatActivity {
         editor.putInt("group_id", groupId);
         editor.putInt("child_id", childId);
         editor.apply();
-        unregisterReceiver(receiver);
     }
 
     public void showHideFragment(int groupId, int childPosition) {
@@ -286,7 +282,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if (isInputing == 1) {
-            todoFragment.addTodoLayout.setVisibility(View.GONE);
+            todoFragment.unshowAddLayout();
             floatingActionButton.show();
             isInputing = 0;
         } else {

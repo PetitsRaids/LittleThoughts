@@ -8,18 +8,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
-import com.example.littlethoughts.broadcast.ReminderReceiver;
 import com.example.littlethoughts.db.TodoItem;
 
 import org.litepal.LitePal;
 
 import java.util.Calendar;
+import java.util.Locale;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,13 +30,21 @@ import androidx.appcompat.widget.Toolbar;
 
 public class TodoAlarmActivity extends AppCompatActivity {
 
-    EditText todoContent;
+    private EditText todoContent;
 
     private EditText datePicker, timePicker;
 
     SwitchCompat switchCompat;
 
     private Calendar mCalendar;
+
+    private AlarmManager alarmManager;
+
+    private Intent mIntent;
+
+    private PendingIntent pendingIntent;
+
+    private TodoItem todoItem;
 
     private int year, month, dayOfMonth;
 
@@ -55,8 +65,28 @@ public class TodoAlarmActivity extends AppCompatActivity {
         switchCompat.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 reminderLayout.setVisibility(View.VISIBLE);
+                mCalendar = Calendar.getInstance();
+                int defaultTime = mCalendar.get(Calendar.HOUR_OF_DAY);
+                String val;
+                if (defaultTime == 23) {
+                    val = "00:00";
+                } else {
+                    val = ++defaultTime + ":00";
+                }
+                timePicker.setText(val);
+                datePicker.setText("今天");
+                year = mCalendar.get(Calendar.YEAR);
+                month = mCalendar.get(Calendar.MONTH);
+                dayOfMonth = mCalendar.get(Calendar.DAY_OF_MONTH);
+                mCalendar.set(mCalendar.get(Calendar.YEAR),
+                        mCalendar.get(Calendar.MONTH),
+                        mCalendar.get(Calendar.DAY_OF_MONTH),
+                        defaultTime, 0, 0);
+                startAlarm(mCalendar.getTimeInMillis());
+
             } else {
                 reminderLayout.setVisibility(View.GONE);
+                cancelAlarm();
             }
         });
         reminderLayout.setVisibility(View.GONE);
@@ -85,20 +115,29 @@ public class TodoAlarmActivity extends AppCompatActivity {
         Intent intent = getIntent();
         int todoitemId = intent.getIntExtra("todoitem_id", -1);
         if (todoitemId != -1) {
-            TodoItem todoItem = LitePal.find(TodoItem.class, todoitemId);
+            todoItem = LitePal.find(TodoItem.class, todoitemId);
             todoContent.setText(todoItem.getName());
         }
+
+        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        return super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.todo_edit_menu, menu);
+        return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
+                finish();
+                break;
+            case R.id.save_todo:
+                todoItem.setName(todoContent.getText().toString());
+                todoItem.update(todoItem.getId());
                 finish();
                 break;
             default:
@@ -131,20 +170,40 @@ public class TodoAlarmActivity extends AppCompatActivity {
         TimePickerDialog timePickerDialog = new TimePickerDialog(this,
                 (view, hourOfDay, minute) -> {
                     mCalendar = Calendar.getInstance();
-                    mCalendar.set(year, month, dayOfMonth, hourOfDay, minute);
-                    String val = hourOfDay + ":" + minute;
+                    Log.d("ALARM", "showTimePicker: " + year);
+                    Log.d("ALARM", "showTimePicker: " + month);
+                    Log.d("ALARM", "showTimePicker: " + dayOfMonth);
+                    Log.d("ALARM", "showTimePicker: " + hourOfDay);
+                    Log.d("ALARM", "showTimePicker: " + minute);
+                    mCalendar.set(year, month, dayOfMonth, hourOfDay, minute, 0);
+                    String val = hourOfDay + ":" + String.format(Locale.CHINA, "%02d", minute);
                     timePicker.setText(val);
-                    Intent intent = new Intent("com.example.littlethoughts.REMINDER");
-                    PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 1, intent, 0);
                     long milliseconds = mCalendar.getTimeInMillis();
                     if (milliseconds < System.currentTimeMillis()) {
                         milliseconds = milliseconds + (24 * 60 * 60 * 1000);
                     }
-                    AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-                    alarmManager.set(AlarmManager.RTC, milliseconds, pendingIntent);
+                    startAlarm(milliseconds);
                 },
                 calendar.get(Calendar.HOUR_OF_DAY),
                 calendar.get(Calendar.MINUTE), false);
         timePickerDialog.show();
+    }
+
+    private void startAlarm(long time) {
+        if (pendingIntent != null) {
+            alarmManager.cancel(pendingIntent);
+        }
+        mIntent = new Intent();
+        mIntent.setAction("com.example.littlethoughts.REMINDER");
+        mIntent.setPackage("com.example.littlethoughts");
+        mIntent.putExtra("test", mCalendar.get(Calendar.MINUTE));
+        Log.d("ALARM", "startAlarm: " + mCalendar.get(Calendar.MINUTE));
+        pendingIntent = PendingIntent.getBroadcast(this, 1, mIntent, 0);
+        // AlarmManger 是系统级别的，只要系统在运行，就能发送
+        alarmManager.set(AlarmManager.RTC, time, pendingIntent);
+    }
+
+    private void cancelAlarm() {
+        alarmManager.cancel(pendingIntent);
     }
 }

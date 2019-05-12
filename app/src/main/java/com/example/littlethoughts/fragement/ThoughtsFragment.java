@@ -1,12 +1,6 @@
 package com.example.littlethoughts.fragement;
 
-import android.content.Context;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,25 +13,26 @@ import com.example.littlethoughts.db.ThoughtsList;
 
 import org.litepal.LitePal;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class ThoughtsFragment extends Fragment {
 
     private static final String TAG = "ThoughtsFragment";
 
-    public List<ThoughtsItem> thoughtsItemList;
+    private List<ThoughtsItem> thoughtsItemList;
 
     private static ThoughtsList thoughtsList;
 
     public ThoughtsAdapter adapter;
 
     public int childId;
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        Log.d(TAG, "onAttach");
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -50,7 +45,7 @@ public class ThoughtsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView");
         View view = inflater.inflate(R.layout.thoughts_layout, container, false);
-        thoughtsItemList = getThoughtsItemList(childId);
+        thoughtsItemList = new ArrayList<>();
         adapter = new ThoughtsAdapter(getActivity(), thoughtsItemList);
         LinearLayoutManager manager = new LinearLayoutManager(getContext());
         manager.setOrientation(RecyclerView.VERTICAL);
@@ -69,7 +64,7 @@ public class ThoughtsFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        refreshList();
+        refreshList(childId);
         Log.d(TAG, "onStart");
     }
 
@@ -113,37 +108,39 @@ public class ThoughtsFragment extends Fragment {
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
         if (!hidden) {
-            refreshList();
+            refreshList(childId);
         }
     }
 
-    private List<ThoughtsItem> getThoughtsItemList(int childId) {
-        thoughtsList = LitePal.find(ThoughtsList.class, childId);
-        return LitePal.where("thoughtslist_id = ?", String.valueOf(childId))
-                .find(ThoughtsItem.class);
+    public void refreshList(int childId) {
+        LitePal.where("thoughtslist_id = ?", String.valueOf(childId))
+                .findAsync(ThoughtsItem.class).listen(allThoughts -> {
+            thoughtsList = LitePal.find(ThoughtsList.class, childId);
+            thoughtsItemList.clear();
+            thoughtsItemList.addAll(allThoughts);
+            adapter.notifyDataSetChanged();
+        });
     }
 
     public void removeList() {
-        for (ThoughtsItem thoughtsItem : thoughtsItemList) {
-            thoughtsItem.delete();
-        }
-        thoughtsItemList.clear();
-        thoughtsList.delete();
-        adapter.notifyDataSetChanged();
+        LitePal.deleteAllAsync(ThoughtsItem.class, "thoughtslist_id = ?", String.valueOf(childId))
+                .listen(rowsAffected -> {
+                    thoughtsItemList.clear();
+                    thoughtsList.delete();
+                    adapter.notifyDataSetChanged();
+                });
     }
 
-    public void refreshListName(String name){
+    public void refreshListName(String name) {
         thoughtsList.setThoughts(name);
         thoughtsList.update(thoughtsList.getId());
     }
 
-    private void refreshList() {
-        thoughtsItemList.clear();
-        thoughtsItemList.addAll(getThoughtsItemList(childId));
-        adapter.notifyDataSetChanged();
-    }
-
     public ThoughtsList getThoughtsList() {
         return thoughtsList;
+    }
+
+    public void addItem(ThoughtsItem thoughtsItem){
+        thoughtsItemList.add(thoughtsItem);
     }
 }
