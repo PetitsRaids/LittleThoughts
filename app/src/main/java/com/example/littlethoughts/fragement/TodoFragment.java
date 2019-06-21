@@ -3,7 +3,6 @@ package com.example.littlethoughts.fragement;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Vibrator;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,8 +31,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class TodoFragment extends Fragment {
 
-    private static final String TAG = "TodoFragment";
-
     private TodoAdapter adapter;
 
     private LinearLayout addTodoLayout;
@@ -49,7 +46,6 @@ public class TodoFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate");
     }
 
     @Nullable
@@ -57,7 +53,6 @@ public class TodoFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.todo_layout, container, false);
         RecyclerView todoRecyclerView = view.findViewById(R.id.todo_recycler_view);
-        Log.d(TAG, "onCreateView");
         todoItemList = new ArrayList<>();
         adapter = new TodoAdapter(getContext(), todoItemList);
         LinearLayoutManager manager = new LinearLayoutManager(getContext());
@@ -103,50 +98,42 @@ public class TodoFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.d(TAG, "onActivityCreated: ");
     }
 
     @Override
     public void onStart() {
         super.onStart();
         refreshList(childId);
-        Log.d(TAG, "onStart");
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        Log.d(TAG, "onResume");
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        Log.d(TAG, "onPause");
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        Log.d(TAG, "onStop");
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        Log.d(TAG, "onDestroyView");
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d(TAG, "onDestroy");
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        Log.d(TAG, "onDetach");
     }
 
     @Override
@@ -155,7 +142,6 @@ public class TodoFragment extends Fragment {
         if (!hidden) {
             refreshList(childId);
         }
-        Log.d(TAG, "onHiddenChanged");
     }
 
     public void removeList() {
