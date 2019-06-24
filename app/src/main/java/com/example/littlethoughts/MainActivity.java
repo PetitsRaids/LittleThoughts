@@ -9,6 +9,7 @@ import com.example.littlethoughts.service.ReminderService;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.appcompat.app.ActionBar;
@@ -126,11 +127,11 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }, 300);
                 } else {
-                    drawerLayout.openDrawer(Gravity.START);
+                    drawerLayout.openDrawer(GravityCompat.START);
                     Toast.makeText(this, R.string.introduction, Toast.LENGTH_SHORT).show();
                 }
             } else {
-                drawerLayout.openDrawer(Gravity.START);
+                drawerLayout.openDrawer(GravityCompat.START);
                 Toast.makeText(this, R.string.introduction, Toast.LENGTH_SHORT).show();
             }
         });
