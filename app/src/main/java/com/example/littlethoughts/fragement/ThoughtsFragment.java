@@ -1,34 +1,44 @@
 package com.example.littlethoughts.fragement;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.EditText;
 
+import com.example.littlethoughts.MainActivity;
 import com.example.littlethoughts.R;
 import com.example.littlethoughts.adapter.ThoughtsAdapter;
 import com.example.littlethoughts.db.ThoughtsItem;
 import com.example.littlethoughts.db.ThoughtsList;
+import com.example.littlethoughts.utils.Logger;
 
 import org.litepal.LitePal;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import static java.text.DateFormat.getDateTimeInstance;
 
 public class ThoughtsFragment extends Fragment {
 
     private List<ThoughtsItem> thoughtsItemList;
 
-    private static ThoughtsList thoughtsList;
+    private ThoughtsList thoughtsList;
 
-    public ThoughtsAdapter adapter;
+    private ThoughtsAdapter adapter;
+
+    private MainActivity mainActivity;
 
     public int childId;
 
@@ -42,7 +52,7 @@ public class ThoughtsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.thoughts_layout, container, false);
         thoughtsItemList = new ArrayList<>();
-        adapter = new ThoughtsAdapter(getActivity(), thoughtsItemList);
+        adapter = new ThoughtsAdapter(getContext(), thoughtsItemList);
         LinearLayoutManager manager = new LinearLayoutManager(getContext());
         manager.setOrientation(RecyclerView.VERTICAL);
         RecyclerView thoughtsRecyclerView = view.findViewById(R.id.thoughts_recycler_view);
@@ -54,53 +64,23 @@ public class ThoughtsFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        refreshList(childId);
+        mainActivity = (MainActivity) getActivity();
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        refreshList(childId);
+        Logger.d("ThoughtsFragment onResume");
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        Logger.d("ThoughtsFragment onPause");
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
-
-    @Override
-    public void onHiddenChanged(boolean hidden) {
-        super.onHiddenChanged(hidden);
-        if (!hidden) {
-            refreshList(childId);
-        }
-    }
-
-    public void refreshList(int childId) {
+    private void refreshList(int childId) {
         LitePal.where("thoughtslist_id = ?", String.valueOf(childId))
                 .findAsync(ThoughtsItem.class).listen(allThoughts -> {
             thoughtsList = LitePal.find(ThoughtsList.class, childId);
@@ -124,11 +104,39 @@ public class ThoughtsFragment extends Fragment {
         thoughtsList.update(thoughtsList.getId());
     }
 
-    public ThoughtsList getThoughtsList() {
-        return thoughtsList;
+    private void addItem(ThoughtsItem thoughtsItem){
+        thoughtsItemList.add(thoughtsItem);
+        adapter.notifyItemInserted(adapter.getItemCount());
     }
 
-    public void addItem(ThoughtsItem thoughtsItem){
-        thoughtsItemList.add(thoughtsItem);
+    public void addLittleThought(){
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.add_thoughts_dialog, null, false);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        EditText thoughtsEdit = view.findViewById(R.id.add_thoughts_content);
+        Button cancel = view.findViewById(R.id.thoughts_add_cancel);
+        Button sure = view.findViewById(R.id.thoughts_add_sure);
+        AlertDialog dialog = builder.create();
+        dialog.setView(view);
+        dialog.setCancelable(true);
+        cancel.setOnClickListener(l -> {
+            mainActivity.getInputMethodManager().hideSoftInputFromWindow(thoughtsEdit.getWindowToken(), 0);
+            dialog.dismiss();
+            mainActivity.getFloatingActionButton().show();
+        });
+        sure.setOnClickListener(l -> {
+            ThoughtsItem thoughtsItem = new ThoughtsItem();
+            thoughtsItem.setContent(thoughtsEdit.getText().toString());
+            thoughtsItem.setThoughtsList(thoughtsList);
+            thoughtsItem.setCreateTime(getDateTimeInstance().format(new Date(System.currentTimeMillis())));
+            thoughtsItem.save();
+            addItem(thoughtsItem);
+//            refreshList(adapter.getItemCount() - 1);
+            mainActivity.getInputMethodManager().hideSoftInputFromWindow(thoughtsEdit.getWindowToken(), 0);
+            dialog.dismiss();
+            mainActivity.getFloatingActionButton().show();
+        });
+        dialog.show();
+        thoughtsEdit.requestFocus();
+//        mainActivity.getInputMethodManager().toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
     }
 }

@@ -44,7 +44,7 @@ public class MenuFragment extends Fragment {
             MainActivity mainActivity = (MainActivity) getActivity();
             if (mainActivity != null) {
                 mainActivity.drawerLayout.closeDrawers();
-                mainActivity.showHideFragment(groupPosition, childPosition);
+                mainActivity.changeList(groupPosition, childPosition);
             }
             return true;
         });

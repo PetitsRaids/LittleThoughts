@@ -8,13 +8,15 @@
         android:id="@+id/todo_check"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:layout_gravity="center" />
+        android:layout_gravity="center"
+        android:layout_margin="10dp" />
 
     <TextView
         android:id="@+id/todo_tv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:textSize="30sp" />
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textSize="24sp" />
 </LinearLayout>

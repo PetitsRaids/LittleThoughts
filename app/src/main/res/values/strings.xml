@@ -4,25 +4,32 @@
     <string name="thoughts">小想法</string>
     <string name="user_name">Petits Raids</string>
     <string name="email">gakki611@ga.com</string>
+
     <string name="cover_description">The background of head portrait</string>
+    <string name="background_des">background image</string>
     <string name="head_portrait">head portrait</string>
     <string name="fold">to fold or unfold</string>
+
     <string name="cancel">取消</string>
     <string name="sure_add">添加</string>
     <string name="add_todo_item">添加待办事项</string>
     <string name="add_thoughts">添加小想法</string>
     <string name="add_thoughts_hint">在此输入内容</string>
     <string name="save">保存</string>
+
     <string name="edit_thoughts">编辑小想法</string>
     <string name="introduction">请添加/选择待办事项或者小想法</string>
     <string name="remove_list">删除此列表</string>
     <string name="exit">退出APP</string>
+
     <string name="delete">删除</string>
     <string name="delete_make_sure">确认删除</string>
     <string name="delete_message">删掉吗？</string>
+
     <string name="delete_without_select">请先选择一个列表</string>
     <string name="edit_list_name">编辑列表名称</string>
     <string name="sure_edit">修改</string>
+
     <string name="todo_item_name">代办事项名称</string>
     <string name="set_alarm">设置提醒</string>
     <string name="alarm_switch_description">设置提醒的按钮</string>

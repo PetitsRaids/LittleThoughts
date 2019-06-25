@@ -4,22 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-
-import com.example.littlethoughts.service.ReminderService;
-import com.google.android.material.appbar.CollapsingToolbarLayout;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.FragmentTransaction;
-
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,16 +14,34 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.viewpager.widget.ViewPager;
+
+import com.example.littlethoughts.adapter.FragmentAdapter;
 import com.example.littlethoughts.db.ThoughtsItem;
 import com.example.littlethoughts.db.ThoughtsList;
 import com.example.littlethoughts.db.TodoList;
 import com.example.littlethoughts.fragement.MenuFragment;
 import com.example.littlethoughts.fragement.ThoughtsFragment;
 import com.example.littlethoughts.fragement.TodoFragment;
+import com.example.littlethoughts.service.ReminderService;
+import com.example.littlethoughts.utils.Logger;
+import com.example.littlethoughts.widget.CustomViewPager;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.litepal.LitePal;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -46,15 +49,15 @@ import static java.text.DateFormat.getDateTimeInstance;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Fragment currentFragment;
+    private ViewPager viewPager;
 
-    private static TodoFragment todoFragment;
+    private TodoFragment todoFragment;
 
-    private static ThoughtsFragment thoughtsFragment;
+    private ThoughtsFragment thoughtsFragment;
 
     public DrawerLayout drawerLayout;
 
-    public FloatingActionButton floatingActionButton;
+    private FloatingActionButton floatingActionButton;
 
     public InputMethodManager inputMethodManager;
 
@@ -74,58 +77,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        drawerLayout = findViewById(R.id.drawer_layout);
-        todoFragment = new TodoFragment();
-        thoughtsFragment = new ThoughtsFragment();
-        floatingActionButton = findViewById(R.id.floating_button);
+
+        init();
+
         floatingActionButton.setOnClickListener(v -> {
             if (groupId != -1 && childId != -1) {
-                if (currentFragment == todoFragment) {
+                if (groupId == 0) {
                     isInputing = 1;
-                    todoFragment.showAddLayout();
-                    inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-                    inputMethodManager.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
-                    todoFragment.addTodoEdit.requestFocus();
+                    todoFragment.addTodoItem();
                     floatingActionButton.hide();
-                } else if (currentFragment == thoughtsFragment) {
-                    View view = LayoutInflater.from(MainActivity.this).inflate(R.layout.add_thoughts_dialog, null, false);
-                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                    EditText thoughtsEdit = view.findViewById(R.id.add_thoughts_content);
-                    Button cancel = view.findViewById(R.id.thoughts_add_cancel);
-                    Button sure = view.findViewById(R.id.thoughts_add_sure);
-                    AlertDialog dialog = builder.create();
-                    dialog.setView(view);
-                    dialog.setCancelable(true);
-                    cancel.setOnClickListener(l -> {
-                        inputMethodManager.hideSoftInputFromWindow(thoughtsEdit.getWindowToken(), 0);
-                        dialog.dismiss();
-                        floatingActionButton.show();
-                    });
-                    sure.setOnClickListener(l -> {
-                        ThoughtsItem thoughtsItem = new ThoughtsItem();
-                        thoughtsItem.setContent(thoughtsEdit.getText().toString());
-                        thoughtsItem.setThoughtsList(thoughtsFragment.getThoughtsList());
-                        thoughtsItem.setCreateTime(getDateTimeInstance().format(new Date(System.currentTimeMillis())));
-                        thoughtsItem.save();
-                        thoughtsFragment.addItem(thoughtsItem);
-                        thoughtsFragment.refreshList(thoughtsFragment.adapter.getItemCount() - 1);
-                        inputMethodManager.hideSoftInputFromWindow(thoughtsEdit.getWindowToken(), 0);
-                        dialog.dismiss();
-                        floatingActionButton.show();
-                    });
-                    dialog.show();
+                } else if (groupId == 1) {
+                    thoughtsFragment.addLittleThought();
                     floatingActionButton.hide();
-                    Timer timer = new Timer();
-                    timer.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            runOnUiThread(() -> {
-                                thoughtsEdit.requestFocus();
-                                inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-                                inputMethodManager.showSoftInput(thoughtsEdit, 0);
-                            });
-                        }
-                    }, 300);
                 } else {
                     drawerLayout.openDrawer(GravityCompat.START);
                     Toast.makeText(this, R.string.introduction, Toast.LENGTH_SHORT).show();
@@ -136,7 +99,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        toolbarLayout = findViewById(R.id.collapsing);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -149,20 +111,28 @@ public class MainActivity extends AppCompatActivity {
         groupId = sharedPreferences.getInt("group_id", -1);
         childId = sharedPreferences.getInt("child_id", -1);
         if (groupId != -1 || childId != -1) {
-            showHideFragment(groupId, childId);
+            changeList(groupId, childId);
         }
+    }
+
+    private void init() {
+        drawerLayout = findViewById(R.id.drawer_layout);
+        viewPager = findViewById(R.id.view_pager);
+        floatingActionButton = findViewById(R.id.floating_button);
+        toolbarLayout = findViewById(R.id.collapsing);
+        todoFragment = new TodoFragment();
+        thoughtsFragment = new ThoughtsFragment();
+        List<Fragment> fragmentList = new ArrayList<>();
+        fragmentList.add(todoFragment);
+        fragmentList.add(thoughtsFragment);
+        viewPager.setAdapter(new FragmentAdapter(getSupportFragmentManager(), fragmentList));
+        inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         startService(new Intent(this, ReminderService.class));
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.d("MainActivity", "onStop");
     }
 
     @Override
@@ -175,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                drawerLayout.openDrawer(Gravity.START);
+                drawerLayout.openDrawer(GravityCompat.START);
                 break;
             case R.id.edit_list:
                 if (groupId != -1) {
@@ -192,9 +162,9 @@ public class MainActivity extends AppCompatActivity {
                         MenuFragment menuFragment = new MenuFragment();
                         menuFragment.editChild(groupId, childId, str);
                         toolbarLayout.setTitle(str);
-                        if(groupId == 0){
+                        if (groupId == 0) {
                             todoFragment.refreshListName(str);
-                        }else{
+                        } else {
                             thoughtsFragment.refreshListName(str);
                         }
                         dialog.dismiss();
@@ -217,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
                     );
                     deleteBtn.setOnClickListener(l -> {
                         alertDialog.dismiss();
-                        if (currentFragment == todoFragment) {
+                        if (groupId == 0) {
                             todoFragment.removeList();
                         } else {
                             thoughtsFragment.removeList();
@@ -245,49 +215,43 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d("MainActivity", "onDestroy");
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
         editor.putInt("group_id", groupId);
         editor.putInt("child_id", childId);
         editor.apply();
     }
 
-    public void showHideFragment(int groupId, int childPosition) {
+    public void changeList(int groupId, int childPosition) {
+        viewPager.setCurrentItem(groupId);
         this.groupId = groupId;
         this.childId = childPosition;
-        Fragment fragment;
         if (groupId == 0) {
-            fragment = todoFragment;
             todoList = LitePal.findAll(TodoList.class).get(childPosition);
             toolbarLayout.setTitle(todoList.getListName());
             todoFragment.childId = todoList.getId();
         } else {
-            fragment = thoughtsFragment;
             thoughtsList = LitePal.findAll(ThoughtsList.class).get(childPosition);
             toolbarLayout.setTitle(thoughtsList.getThoughts());
             thoughtsFragment.childId = thoughtsList.getId();
         }
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        if (!fragment.isAdded()) {
-            if (currentFragment != null) {
-                transaction.hide(currentFragment);
-            }
-            transaction.add(R.id.main_frame_layout, fragment);
-        } else {
-            transaction.hide(currentFragment).show(fragment);
-        }
-        currentFragment = fragment;
-        transaction.commit();
     }
 
     @Override
     public void onBackPressed() {
         if (isInputing == 1) {
-            todoFragment.unshowAddLayout();
+            todoFragment.hiddenAddLayout();
             floatingActionButton.show();
             isInputing = 0;
         } else {
             super.onBackPressed();
         }
+    }
+
+    public InputMethodManager getInputMethodManager(){
+        return inputMethodManager;
+    }
+
+    public FloatingActionButton getFloatingActionButton() {
+        return floatingActionButton;
     }
 }

@@ -6,21 +6,10 @@ import android.os.Vibrator;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-
-import com.example.littlethoughts.MainActivity;
-import com.example.littlethoughts.R;
-import com.example.littlethoughts.TodoItemCallback;
-import com.example.littlethoughts.adapter.TodoAdapter;
-import com.example.littlethoughts.db.TodoItem;
-import com.example.littlethoughts.db.TodoList;
-
-import org.litepal.LitePal;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,24 +18,34 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.littlethoughts.MainActivity;
+import com.example.littlethoughts.R;
+import com.example.littlethoughts.TodoItemCallback;
+import com.example.littlethoughts.adapter.TodoAdapter;
+import com.example.littlethoughts.db.TodoItem;
+import com.example.littlethoughts.db.TodoList;
+import com.example.littlethoughts.utils.Logger;
+
+import org.litepal.LitePal;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class TodoFragment extends Fragment {
 
     private TodoAdapter adapter;
 
     private LinearLayout addTodoLayout;
 
-    public EditText addTodoEdit;
+    private EditText addTodoEdit;
+
+    private MainActivity mainActivity;
 
     private List<TodoItem> todoItemList;
 
-    private static TodoList todoList;
+    private TodoList todoList;
 
     public int childId;
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
 
     @Nullable
     @Override
@@ -59,7 +58,7 @@ public class TodoFragment extends Fragment {
         manager.setOrientation(RecyclerView.VERTICAL);
         todoRecyclerView.setLayoutManager(manager);
         todoRecyclerView.setAdapter(adapter);
-        MainActivity mainActivity = (MainActivity) getActivity();
+        mainActivity = (MainActivity) getActivity();
         todoRecyclerView.setOnLongClickListener(l -> {
             Vibrator vibrator = (Vibrator) mainActivity.getSystemService(Context.VIBRATOR_SERVICE);
             vibrator.vibrate(70);
@@ -71,13 +70,12 @@ public class TodoFragment extends Fragment {
         itemTouchHelper.attachToRecyclerView(todoRecyclerView);
 
         addTodoLayout = view.findViewById(R.id.add_todo_layout);
-        addTodoLayout.setVisibility(View.GONE);
         addTodoEdit = view.findViewById(R.id.add_todo_edit);
         Button addTodoBtn = view.findViewById(R.id.add_todo_btn);
         addTodoBtn.setOnClickListener(v -> {
             String str = addTodoEdit.getText().toString();
             TodoItem todoItem = new TodoItem();
-            todoItem.setTodoList(getTodoList());
+            todoItem.setTodoList(todoList);
             todoItem.setName(str);
             todoItem.setToDefault("checked");
             todoItem.setOrderId(adapter.getItemCount());
@@ -87,7 +85,7 @@ public class TodoFragment extends Fragment {
             todoRecyclerView.scrollToPosition(todoItemList.size() - 1);
             addTodoEdit.setText("");
             addTodoLayout.setVisibility(View.GONE);
-            mainActivity.floatingActionButton.show();
+            mainActivity.getFloatingActionButton().show();
             mainActivity.inputMethodManager
                     .hideSoftInputFromWindow(addTodoEdit.getWindowToken(), 0);  //关闭键盘
             MainActivity.isInputing = 0;
@@ -96,52 +94,16 @@ public class TodoFragment extends Fragment {
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        refreshList(childId);
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
+        refreshList(childId);
+        Logger.d("TodoFragment onResume");
     }
 
     @Override
     public void onPause() {
         super.onPause();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
-
-    @Override
-    public void onHiddenChanged(boolean hidden) {
-        super.onHiddenChanged(hidden);
-        if (!hidden) {
-            refreshList(childId);
-        }
+        Logger.d("TodoFragment onPause");
     }
 
     public void removeList() {
@@ -151,8 +113,8 @@ public class TodoFragment extends Fragment {
             }
             todoItemList.clear();
             todoList.delete();
+            mainActivity.runOnUiThread(() -> adapter.notifyDataSetChanged());
         }).start();
-        adapter.notifyDataSetChanged();
     }
 
     public void refreshListName(String name) {
@@ -162,7 +124,7 @@ public class TodoFragment extends Fragment {
 
     private void refreshList(int childId) {
         LitePal.where("todolist_id = ?", String.valueOf(childId))
-                .findAsync(TodoItem.class).listen((allItems) -> {
+                .findAsync(TodoItem.class).listen(allItems -> {
             todoList = LitePal.find(TodoList.class, childId);
             todoItemList.clear();
             todoItemList.addAll(allItems);
@@ -170,15 +132,13 @@ public class TodoFragment extends Fragment {
         });
     }
 
-    private TodoList getTodoList() {
-        return todoList;
-    }
-
-    public void showAddLayout() {
-        addTodoLayout.setVisibility(View.VISIBLE);
-    }
-
-    public void unshowAddLayout() {
+    public void hiddenAddLayout() {
         addTodoLayout.setVisibility(View.GONE);
+    }
+
+    public void addTodoItem() {
+        addTodoLayout.setVisibility(View.VISIBLE);
+        mainActivity.getInputMethodManager().toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+        addTodoEdit.requestFocus();
     }
 }
