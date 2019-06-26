@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,31 +20,19 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.littlethoughts.adapter.FragmentAdapter;
-import com.example.littlethoughts.db.ThoughtsItem;
-import com.example.littlethoughts.db.ThoughtsList;
-import com.example.littlethoughts.db.TodoList;
 import com.example.littlethoughts.fragement.MenuFragment;
 import com.example.littlethoughts.fragement.ThoughtsFragment;
 import com.example.littlethoughts.fragement.TodoFragment;
 import com.example.littlethoughts.service.ReminderService;
 import com.example.littlethoughts.utils.Logger;
-import com.example.littlethoughts.widget.CustomViewPager;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import org.litepal.LitePal;
-
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import static java.text.DateFormat.getDateTimeInstance;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -62,10 +49,6 @@ public class MainActivity extends AppCompatActivity {
     public InputMethodManager inputMethodManager;
 
     CollapsingToolbarLayout toolbarLayout;
-
-    TodoList todoList;
-
-    ThoughtsList thoughtsList;
 
     public static int isInputing = 0;
 
@@ -110,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         groupId = sharedPreferences.getInt("group_id", -1);
         childId = sharedPreferences.getInt("child_id", -1);
+        Logger.d("MainActivity onCreate");
         if (groupId != -1 || childId != -1) {
             changeList(groupId, childId);
         }
@@ -132,6 +116,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        Logger.d("MainActivity onResume");
+
         startService(new Intent(this, ReminderService.class));
     }
 
@@ -222,17 +208,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void changeList(int groupId, int childPosition) {
-        viewPager.setCurrentItem(groupId);
+        viewPager.setCurrentItem(groupId, false);
         this.groupId = groupId;
         this.childId = childPosition;
         if (groupId == 0) {
-            todoList = LitePal.findAll(TodoList.class).get(childPosition);
-            toolbarLayout.setTitle(todoList.getListName());
-            todoFragment.childId = todoList.getId();
+            toolbarLayout.setTitle(todoFragment.getListName(childPosition));
         } else {
-            thoughtsList = LitePal.findAll(ThoughtsList.class).get(childPosition);
-            toolbarLayout.setTitle(thoughtsList.getThoughts());
-            thoughtsFragment.childId = thoughtsList.getId();
+            toolbarLayout.setTitle(thoughtsFragment.getListName(childPosition));
         }
     }
 
@@ -247,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public InputMethodManager getInputMethodManager(){
+    public InputMethodManager getInputMethodManager() {
         return inputMethodManager;
     }
 
