@@ -11,7 +11,7 @@ import androidx.viewpager.widget.ViewPager;
 
 public class CustomViewPager extends ViewPager {
 
-    private boolean isPagingEnabled = true;
+    private boolean isPagingEnabled = false;
 
     public CustomViewPager(@NonNull Context context) {
         super(context);

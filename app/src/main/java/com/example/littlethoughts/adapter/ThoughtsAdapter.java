@@ -2,17 +2,19 @@ package com.example.littlethoughts.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.littlethoughts.R;
 import com.example.littlethoughts.ThoughtsEditActivity;
 import com.example.littlethoughts.db.ThoughtsItem;
+import com.example.littlethoughts.utils.AntiShakeUtils;
 
 import java.util.List;
 
@@ -46,6 +48,8 @@ public class ThoughtsAdapter extends RecyclerView.Adapter<ThoughtsAdapter.ViewHo
         View view = LayoutInflater.from(mContext).inflate(R.layout.thoughts_item, viewGroup, false);
         ViewHolder viewHolder = new ViewHolder(view);
         viewHolder.cardView.setOnClickListener(l -> {
+            if (AntiShakeUtils.isInvalidClick(viewHolder.cardView, 800))
+                return;
             Intent intent = new Intent(mContext, ThoughtsEditActivity.class);
             intent.putExtra("thoughts_id", thoughtsItemList.get(viewHolder.getAdapterPosition()).getId());
             mContext.startActivity(intent);

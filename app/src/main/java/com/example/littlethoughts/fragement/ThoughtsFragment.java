@@ -19,7 +19,7 @@ import com.example.littlethoughts.R;
 import com.example.littlethoughts.adapter.ThoughtsAdapter;
 import com.example.littlethoughts.db.ThoughtsItem;
 import com.example.littlethoughts.db.ThoughtsList;
-import com.example.littlethoughts.utils.Logger;
+import com.example.littlethoughts.widget.AddEditDialog;
 
 import org.litepal.LitePal;
 
@@ -44,13 +44,11 @@ public class ThoughtsFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Logger.d("ThoughtsFragment onCreate");
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Logger.d("ThoughtsFragment onCreateView");
         View view = inflater.inflate(R.layout.thoughts_layout, container, false);
         thoughtsItemList = new ArrayList<>();
         adapter = new ThoughtsAdapter(getContext(), thoughtsItemList);
@@ -59,7 +57,6 @@ public class ThoughtsFragment extends Fragment {
         RecyclerView thoughtsRecyclerView = view.findViewById(R.id.thoughts_recycler_view);
         thoughtsRecyclerView.setLayoutManager(manager);
         thoughtsRecyclerView.setAdapter(adapter);
-
         return view;
     }
 
@@ -70,26 +67,13 @@ public class ThoughtsFragment extends Fragment {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        Logger.d("ThoughtsFragment onStart");
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         refreshList(childPosition);
-        Logger.d("ThoughtsFragment onResume");
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        Logger.d("ThoughtsFragment onPause");
-    }
-
-    private void refreshList(int childId) {
-        thoughtsList = LitePal.findAll(ThoughtsList.class).get(childId);
+    public void refreshList(int childPosition) {
+        thoughtsList = LitePal.findAll(ThoughtsList.class).get(childPosition);
         LitePal.where("thoughtslist_id = ?", String.valueOf(thoughtsList.getId()))
                 .findAsync(ThoughtsItem.class).listen(allItem -> {
             thoughtsItemList.clear();
@@ -117,41 +101,24 @@ public class ThoughtsFragment extends Fragment {
         adapter.notifyItemInserted(adapter.getItemCount());
     }
 
-    public void addLittleThought() {
-        View view = LayoutInflater.from(getContext()).inflate(R.layout.add_thoughts_dialog, null, false);
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        EditText thoughtsEdit = view.findViewById(R.id.add_thoughts_content);
-        Button cancel = view.findViewById(R.id.thoughts_add_cancel);
-        Button sure = view.findViewById(R.id.thoughts_add_sure);
-        AlertDialog dialog = builder.create();
-        dialog.setView(view);
-        dialog.setCancelable(true);
-        cancel.setOnClickListener(l -> {
-            mainActivity.getInputMethodManager().hideSoftInputFromWindow(thoughtsEdit.getWindowToken(), 0);
-            dialog.dismiss();
-            mainActivity.getFloatingActionButton().show();
-        });
-        sure.setOnClickListener(l -> {
-            ThoughtsItem thoughtsItem = new ThoughtsItem();
-            thoughtsItem.setContent(thoughtsEdit.getText().toString());
-            thoughtsItem.setThoughtsList(thoughtsList);
-            thoughtsItem.setCreateTime(getDateTimeInstance().format(new Date(System.currentTimeMillis())));
-            thoughtsItem.save();
-            addItem(thoughtsItem);
-//            refreshList(adapter.getItemCount() - 1);
-            mainActivity.getInputMethodManager().hideSoftInputFromWindow(thoughtsEdit.getWindowToken(), 0);
-            dialog.dismiss();
-            mainActivity.getFloatingActionButton().show();
-        });
-        dialog.show();
-        thoughtsEdit.requestFocus();
-//        mainActivity.getInputMethodManager().toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
-    }
-
     public String getListName(int childPosition) {
         thoughtsList = LitePal.findAll(ThoughtsList.class).get(childPosition);
         this.childPosition = childPosition;
         return thoughtsList.getThoughts();
+    }
+
+    public void addLittleThought() {
+        new AddEditDialog(getContext(), R.string.add_thoughts, "", R.string.sure_add,
+                () -> mainActivity.getFloatingActionButton().show(),
+                editText -> {
+                    ThoughtsItem thoughtsItem = new ThoughtsItem();
+                    thoughtsItem.setContent(editText);
+                    thoughtsItem.setThoughtsList(thoughtsList);
+                    thoughtsItem.setCreateTime(getDateTimeInstance().format(new Date(System.currentTimeMillis())));
+                    thoughtsItem.save();
+                    addItem(thoughtsItem);
+                    mainActivity.getFloatingActionButton().show();
+                });
     }
 
 }

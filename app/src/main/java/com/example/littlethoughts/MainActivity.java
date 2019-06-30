@@ -4,17 +4,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
@@ -28,6 +23,8 @@ import com.example.littlethoughts.fragement.ThoughtsFragment;
 import com.example.littlethoughts.fragement.TodoFragment;
 import com.example.littlethoughts.service.ReminderService;
 import com.example.littlethoughts.utils.Logger;
+import com.example.littlethoughts.widget.AddEditDialog;
+import com.example.littlethoughts.widget.EnsureDialog;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -37,6 +34,8 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private ViewPager viewPager;
+
+    private MenuFragment menuFragment;
 
     private TodoFragment todoFragment;
 
@@ -55,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
     private int groupId = 0;
 
     private int childId = 0;
+
+    private boolean isFirstTime = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,7 +94,6 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         groupId = sharedPreferences.getInt("group_id", -1);
         childId = sharedPreferences.getInt("child_id", -1);
-        Logger.d("MainActivity onCreate");
         if (groupId != -1 || childId != -1) {
             changeList(groupId, childId);
         }
@@ -104,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
         viewPager = findViewById(R.id.view_pager);
         floatingActionButton = findViewById(R.id.floating_button);
         toolbarLayout = findViewById(R.id.collapsing);
+        menuFragment = new MenuFragment();
         todoFragment = new TodoFragment();
         thoughtsFragment = new ThoughtsFragment();
         List<Fragment> fragmentList = new ArrayList<>();
@@ -116,8 +117,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Logger.d("MainActivity onResume");
-
         startService(new Intent(this, ReminderService.class));
     }
 
@@ -135,56 +134,38 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.edit_list:
                 if (groupId != -1) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                    View view = LayoutInflater.from(MainActivity.this).inflate(R.layout.edit_list_dialog, null, false);
-                    EditText editText = view.findViewById(R.id.edit_list_name);
-                    Button cancel = view.findViewById(R.id.edit_cancel);
-                    Button editName = view.findViewById(R.id.edit_sure);
-                    builder.setView(view);
-                    AlertDialog dialog = builder.create();
-                    cancel.setOnClickListener(l -> dialog.dismiss());
-                    editName.setOnClickListener(l -> {
-                        String str = editText.getText().toString();
-                        MenuFragment menuFragment = new MenuFragment();
-                        menuFragment.editChild(groupId, childId, str);
-                        toolbarLayout.setTitle(str);
-                        if (groupId == 0) {
-                            todoFragment.refreshListName(str);
-                        } else {
-                            thoughtsFragment.refreshListName(str);
-                        }
-                        dialog.dismiss();
-                    });
-                    dialog.show();
+                    new AddEditDialog(MainActivity.this,
+                            R.string.edit_list_name,
+                            "", R.string.sure_edit, null,
+                            str -> {
+                                menuFragment.editChild(groupId, childId, str);
+                                toolbarLayout.setTitle(str);
+                                if (groupId == 0) {
+                                    todoFragment.refreshListName(str);
+                                } else {
+                                    thoughtsFragment.refreshListName(str);
+                                }
+                            });
                 } else {
                     Toast.makeText(this, R.string.delete_without_select, Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.remove_list:
                 if (groupId != -1) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                    View dialogView = LayoutInflater.from(this).inflate(R.layout.delete_dialog, null, false);
-                    Button cancel = dialogView.findViewById(R.id.list_delete_cancel);
-                    Button deleteBtn = dialogView.findViewById(R.id.list_delete_sure);
-                    builder.setView(dialogView);
-                    AlertDialog alertDialog = builder.create();
-                    cancel.setOnClickListener(l ->
-                            alertDialog.dismiss()
-                    );
-                    deleteBtn.setOnClickListener(l -> {
-                        alertDialog.dismiss();
-                        if (groupId == 0) {
-                            todoFragment.removeList();
-                        } else {
-                            thoughtsFragment.removeList();
-                        }
-                        MenuFragment menuFragment = new MenuFragment();
-                        menuFragment.removeChild(groupId, childId);
-                        toolbarLayout.setTitle("Little Thoughts");
-                        groupId = -1;
-                        childId = -1;
-                    });
-                    alertDialog.show();
+                    new EnsureDialog(MainActivity.this,
+                            R.string.delete_make_sure, R.string.delete_message, R.string.delete,
+                            () -> {
+                                if (groupId == 0) {
+                                    todoFragment.removeList();
+                                } else {
+                                    thoughtsFragment.removeList();
+                                }
+                                menuFragment.removeChild(groupId, childId);
+                                toolbarLayout.setTitle("Little Thoughts");
+                                Toast.makeText(MainActivity.this, R.string.delete, Toast.LENGTH_SHORT).show();
+                                groupId = -1;
+                                childId = -1;
+                            });
                 } else {
                     Toast.makeText(this, R.string.delete_without_select, Toast.LENGTH_SHORT).show();
                 }
@@ -203,19 +184,33 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
         editor.putInt("group_id", groupId);
+        Logger.d("group_id" + groupId);
         editor.putInt("child_id", childId);
+        Logger.d("child_id" + childId);
         editor.apply();
     }
 
     public void changeList(int groupId, int childPosition) {
+        if (groupId == 0) {
+            toolbarLayout.setTitle(todoFragment.getListName(childPosition));
+            if (isFirstTime) {
+                isFirstTime = false;
+            } else {
+                if (this.groupId == groupId)
+                    todoFragment.refreshList(childPosition);
+            }
+        } else {
+            toolbarLayout.setTitle(thoughtsFragment.getListName(childPosition));
+            if (isFirstTime) {
+                isFirstTime = false;
+            } else {
+                if (this.groupId == groupId)
+                    thoughtsFragment.refreshList(childPosition);
+            }
+        }
         viewPager.setCurrentItem(groupId, false);
         this.groupId = groupId;
         this.childId = childPosition;
-        if (groupId == 0) {
-            toolbarLayout.setTitle(todoFragment.getListName(childPosition));
-        } else {
-            toolbarLayout.setTitle(thoughtsFragment.getListName(childPosition));
-        }
     }
 
     @Override

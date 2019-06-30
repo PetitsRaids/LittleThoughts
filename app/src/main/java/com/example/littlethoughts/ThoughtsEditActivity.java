@@ -1,22 +1,28 @@
 package com.example.littlethoughts;
 
 import android.os.Bundle;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import com.example.littlethoughts.db.ThoughtsItem;
+import com.example.littlethoughts.widget.EnsureDialog;
 
 import org.litepal.LitePal;
 
 public class ThoughtsEditActivity extends AppCompatActivity {
 
-    EditText editText;
+    private EditText editText;
 
-    ThoughtsItem thoughtsItem;
+    private ThoughtsItem thoughtsItem;
+
+    private boolean isChanged;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,11 +32,27 @@ public class ThoughtsEditActivity extends AppCompatActivity {
         thoughtsItem = LitePal.find(ThoughtsItem.class, id);
         editText = findViewById(R.id.edit_thoughts);
         editText.setText(thoughtsItem.getContent());
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                isChanged = true;
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
         Toolbar toolbar = findViewById(R.id.edit_toolbar);
         toolbar.setTitle(R.string.edit_thoughts);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
-        if(actionBar != null){
+        if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
@@ -45,16 +67,29 @@ public class ThoughtsEditActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                finish();
+                if (isChanged)
+                    new EnsureDialog(ThoughtsEditActivity.this,
+                            R.string.back, R.string.save_or_not, R.string.save, () -> {
+                        saveThought();
+                        finish();
+                    });
+                else
+                    finish();
                 break;
             case R.id.save_thoughts:
-                thoughtsItem.setContent(editText.getText().toString());
-                thoughtsItem.update(thoughtsItem.getId());
+                if (isChanged) {
+                    saveThought();
+                }
                 finish();
                 break;
             default:
                 break;
         }
         return true;
+    }
+
+    private void saveThought() {
+        thoughtsItem.setContent(editText.getText().toString());
+        thoughtsItem.update(thoughtsItem.getId());
     }
 }

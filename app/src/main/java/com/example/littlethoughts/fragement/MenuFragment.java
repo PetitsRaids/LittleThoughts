@@ -26,7 +26,7 @@ public class MenuFragment extends Fragment {
 
     private static List<List<String>> childList;
 
-    private static MenuExpandableAdapter adapter;
+    private MenuExpandableAdapter adapter;
 
     private ExpandableListView expandableListView;
 
@@ -52,12 +52,8 @@ public class MenuFragment extends Fragment {
                 PreferenceManager.getDefaultSharedPreferences(getContext());
         boolean expand0 = sharedPreferences.getBoolean("expand0", false);
         boolean expand1 = sharedPreferences.getBoolean("expand1", false);
-        if(expand0){
-            expandableListView.expandGroup(0);
-        }
-        if(expand1){
-            expandableListView.expandGroup(1);
-        }
+        if(expand0) expandableListView.expandGroup(0);
+        if(expand1) expandableListView.expandGroup(1);
         return view;
     }
 

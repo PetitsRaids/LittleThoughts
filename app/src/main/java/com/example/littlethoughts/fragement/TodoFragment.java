@@ -47,16 +47,9 @@ public class TodoFragment extends Fragment {
 
     private int childPosition;
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Logger.d("TodoFragment onCreate");
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Logger.d("TodoFragment onCreateView");
         View view = inflater.inflate(R.layout.todo_layout, container, false);
         RecyclerView todoRecyclerView = view.findViewById(R.id.todo_recycler_view);
         todoItemList = new ArrayList<>();
@@ -101,48 +94,22 @@ public class TodoFragment extends Fragment {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        Logger.d("TodoFragment onStart");
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         refreshList(childPosition);
-        Logger.d("TodoFragment onResume");
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        Logger.d("TodoFragment onPause");
     }
 
     public void removeList() {
-        LitePal.deleteAllAsync(TodoItem.class, "todoitem_id = ?", String.valueOf(todoList.getId())
-        ).listen(rowsAffected -> {
+        LitePal.deleteAllAsync(TodoItem.class, "todolist_id = ?", String.valueOf(todoList.getId())).listen(rowsAffected -> {
             todoItemList.clear();
             todoList.delete();
             adapter.notifyDataSetChanged();
         });
-//        new Thread(() -> {
-//            for (TodoItem todoItem : todoItemList) {
-//                todoItem.delete();
-//            }
-//            todoItemList.clear();
-//            todoList.delete();
-//            mainActivity.runOnUiThread(() -> adapter.notifyDataSetChanged());
-//        }).start();
     }
 
-    public void refreshListName(String name) {
-        todoList.setListName(name);
-        todoList.update(todoList.getId());
-    }
-
-    private void refreshList(int childPosition) {
+    public void refreshList(int childPosition) {
         todoList = LitePal.findAll(TodoList.class).get(childPosition);
+        Logger.d(todoList.getId());
         LitePal.where("todolist_id = ?", String.valueOf(todoList.getId()))
                 .findAsync(TodoItem.class).listen(allItems -> {
             todoItemList.clear();
@@ -167,4 +134,8 @@ public class TodoFragment extends Fragment {
         return todoList.getListName();
     }
 
+    public void refreshListName(String name) {
+        todoList.setListName(name);
+        todoList.update(todoList.getId());
+    }
 }

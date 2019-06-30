@@ -1,19 +1,18 @@
 package com.example.littlethoughts.adapter;
 
 import android.content.Context;
-import androidx.appcompat.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.littlethoughts.R;
 import com.example.littlethoughts.db.ThoughtsList;
 import com.example.littlethoughts.db.TodoList;
+import com.example.littlethoughts.widget.AddEditDialog;
 
 import java.util.List;
 
@@ -54,43 +53,29 @@ public class MenuExpandableAdapter extends BaseExpandableListAdapter {
         }
 
         groupViewHolder.listName.setText(listNames[groupPosition]);
-        groupViewHolder.addList.setOnClickListener(view -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-            View dialogView = LayoutInflater.from(mContext).inflate(R.layout.add_list_dialog, null, false);
-            TextView textView = dialogView.findViewById(R.id.add_text);
-            EditText editText = dialogView.findViewById(R.id.add_edit);
-            Button sureAdd = dialogView.findViewById(R.id.add_sure);
-            Button cancelAdd = dialogView.findViewById(R.id.add_cancel);
-            builder.setView(dialogView);
-            AlertDialog dialog = builder.create();
-            dialog.setCancelable(true);
-            String str = "添加" + listNames[groupPosition];
-            textView.setText(str);
-            cancelAdd.setOnClickListener(v -> dialog.dismiss());
-            sureAdd.setOnClickListener(v -> {
-                String val = editText.getText().toString();
-                if (val.equals("")) {
-                    Toast.makeText(mContext, "请输入列表名称！", Toast.LENGTH_SHORT).show();
-                } else {
-                    if (listNames[groupPosition].equals("待办事项")) {
-                        TodoList todoList = new TodoList();
-                        todoList.setListName(val);
-                        todoList.save();
-                        childrenList.get(groupPosition).add(val);
-                        notifyDataSetChanged();
-                    } else if (listNames[groupPosition].equals("小想法")) {
-                        ThoughtsList thoughtsList = new ThoughtsList();
-                        thoughtsList.setThoughts(val);
-                        thoughtsList.save();
-                        childrenList.get(groupPosition).add(val);
-                        notifyDataSetChanged();
-                    }
-                    Toast.makeText(mContext, "已添加", Toast.LENGTH_SHORT).show();
-                    dialog.dismiss();
-                }
-            });
-            dialog.show();
-        });
+        groupViewHolder.addList.setOnClickListener(view ->
+                new AddEditDialog(mContext,
+                        "添加" + listNames[groupPosition], "", mContext.getText(R.string.sure_add).toString(), null,
+                        editText -> {
+                            if (editText.equals("")) {
+                                Toast.makeText(mContext, "请输入列表名称！", Toast.LENGTH_SHORT).show();
+                            } else {
+                                if (groupPosition == 0) {
+                                    TodoList todoList = new TodoList();
+                                    todoList.setListName(editText);
+                                    todoList.save();
+                                    childrenList.get(groupPosition).add(editText);
+                                    notifyDataSetChanged();
+                                } else {
+                                    ThoughtsList thoughtsList = new ThoughtsList();
+                                    thoughtsList.setThoughts(editText);
+                                    thoughtsList.save();
+                                    childrenList.get(groupPosition).add(editText);
+                                    notifyDataSetChanged();
+                                }
+                                Toast.makeText(mContext, "已添加", Toast.LENGTH_SHORT).show();
+                            }
+                        }));
         groupViewHolder.addList.setFocusable(false);
         return convertView;
     }

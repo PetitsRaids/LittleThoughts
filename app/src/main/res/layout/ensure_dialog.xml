@@ -5,30 +5,30 @@
     android:orientation="vertical">
 
     <TextView
+        android:id="@+id/ensure_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:text="@string/add_thoughts"
-        android:textSize="24sp" />
+        android:text="@string/delete_make_sure"
+        android:layout_margin="10dp"
+        android:textColor="#000"
+        android:textSize="22sp" />
 
-    <EditText
-        android:id="@+id/add_thoughts_content"
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/ensure_message"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:background="@drawable/edit_background"
-        android:hint="@string/add_thoughts_hint"
-        android:inputType="textMultiLine"
-        android:textSize="20sp"
-        android:padding="10dp"
-        android:maxLines="6" />
+        android:layout_marginStart="20dp"
+        android:text="@string/delete_message"
+        android:textColor="#000"
+        android:textSize="18sp" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp">
 
         <Button
-            android:id="@+id/thoughts_add_cancel"
+            android:id="@+id/ensure_cancel"
             style="@style/Base.Widget.AppCompat.ButtonBar.AlertDialog"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -37,12 +37,13 @@
             android:textSize="18sp" />
 
         <Button
-            android:id="@+id/thoughts_add_sure"
+            android:id="@+id/ensure_sure"
             style="@style/Base.Widget.AppCompat.ButtonBar.AlertDialog"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/sure_add"
+            android:text="@string/delete"
             android:textSize="18sp" />
     </LinearLayout>
+
 </LinearLayout>
