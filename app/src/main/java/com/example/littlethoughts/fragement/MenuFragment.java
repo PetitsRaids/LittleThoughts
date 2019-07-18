@@ -26,7 +26,7 @@ public class MenuFragment extends Fragment {
 
     private static List<List<String>> childList;
 
-    private MenuExpandableAdapter adapter;
+    private static MenuExpandableAdapter adapter;
 
     private ExpandableListView expandableListView;
 
@@ -78,12 +78,12 @@ public class MenuFragment extends Fragment {
         childList.add(list);
     }
 
-    public void editChild(int groupId, int childId, String name){
+    public static void editChild(int groupId, int childId, String name){
         childList.get(groupId).set(childId, name);
         adapter.notifyDataSetChanged();
     }
 
-    public void removeChild(int groupId, int childId){
+    public static void removeChild(int groupId, int childId){
         childList.get(groupId).remove(childId);
         adapter.notifyDataSetChanged();
     }

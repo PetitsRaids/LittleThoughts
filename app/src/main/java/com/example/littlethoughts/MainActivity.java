@@ -35,8 +35,6 @@ public class MainActivity extends AppCompatActivity {
 
     private ViewPager viewPager;
 
-    private MenuFragment menuFragment;
-
     private TodoFragment todoFragment;
 
     private ThoughtsFragment thoughtsFragment;
@@ -49,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
     CollapsingToolbarLayout toolbarLayout;
 
-    public static int isInputing = 0;
+    public static boolean isInputing = false;
 
     private int groupId = 0;
 
@@ -67,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
         floatingActionButton.setOnClickListener(v -> {
             if (groupId != -1 && childId != -1) {
                 if (groupId == 0) {
-                    isInputing = 1;
+                    isInputing = true;
                     todoFragment.addTodoItem();
                     floatingActionButton.hide();
                 } else if (groupId == 1) {
@@ -96,6 +94,8 @@ public class MainActivity extends AppCompatActivity {
         childId = sharedPreferences.getInt("child_id", -1);
         if (groupId != -1 || childId != -1) {
             changeList(groupId, childId);
+        } else {
+            changeList(0, 0);
         }
     }
 
@@ -104,7 +104,6 @@ public class MainActivity extends AppCompatActivity {
         viewPager = findViewById(R.id.view_pager);
         floatingActionButton = findViewById(R.id.floating_button);
         toolbarLayout = findViewById(R.id.collapsing);
-        menuFragment = new MenuFragment();
         todoFragment = new TodoFragment();
         thoughtsFragment = new ThoughtsFragment();
         List<Fragment> fragmentList = new ArrayList<>();
@@ -138,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
                             R.string.edit_list_name,
                             "", R.string.sure_edit, null,
                             str -> {
-                                menuFragment.editChild(groupId, childId, str);
+                                MenuFragment.editChild(groupId, childId, str);
                                 toolbarLayout.setTitle(str);
                                 if (groupId == 0) {
                                     todoFragment.refreshListName(str);
@@ -160,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
                                 } else {
                                     thoughtsFragment.removeList();
                                 }
-                                menuFragment.removeChild(groupId, childId);
+                                MenuFragment.removeChild(groupId, childId);
                                 toolbarLayout.setTitle("Little Thoughts");
                                 Toast.makeText(MainActivity.this, R.string.delete, Toast.LENGTH_SHORT).show();
                                 groupId = -1;
@@ -215,10 +214,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (isInputing == 1) {
+        if (isInputing) {
             todoFragment.hiddenAddLayout();
             floatingActionButton.show();
-            isInputing = 0;
+            isInputing = false;
         } else {
             super.onBackPressed();
         }

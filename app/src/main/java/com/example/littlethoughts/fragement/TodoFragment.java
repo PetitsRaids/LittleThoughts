@@ -88,7 +88,7 @@ public class TodoFragment extends Fragment {
             mainActivity.getFloatingActionButton().show();
             mainActivity.inputMethodManager
                     .hideSoftInputFromWindow(addTodoEdit.getWindowToken(), 0);  //关闭键盘
-            MainActivity.isInputing = 0;
+            MainActivity.isInputing = false;
         });
         return view;
     }
